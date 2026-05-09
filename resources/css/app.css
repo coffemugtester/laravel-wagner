@@ -132,12 +132,16 @@
     --sidebar-ring: oklch(0.439 0 0);
 }
 
+@import './wagner.css';
+
 @layer base {
-    * {
-        @apply border-border;
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
     }
 
     body {
-        @apply bg-background text-foreground;
+        margin: 0;
     }
 }
