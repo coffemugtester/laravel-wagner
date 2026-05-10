@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import '../../css/wagner.css';
 
 const menuSections = [
     {

@@ -1,11 +1,14 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "mcp__figma-desktop-mcp__get_design_context",
+      "mcp__figma-desktop-mcp__get_screenshot",
+      "Bash(npm run build:*)"
+    ]
+  },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "laravel-boost"
-  ],
-  "permissions": {
-    "allow": [
-      "Bash(ls:*)"
-    ]
-  }
+  ]
 }
