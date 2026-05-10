@@ -11,6 +11,15 @@ interface Reservation {
     notes?: string;
 }
 
+interface Event {
+    id: number;
+    name: string;
+    date: string;
+    timeFrom: string;
+    timeTo: string;
+    notes?: string;
+}
+
 interface MenuItem {
     id: number;
     name: string;
@@ -54,6 +63,40 @@ const mockReservations: Reservation[] = [
         time: '19:30',
         guests: 3,
         phone: '030 456-7890',
+    },
+];
+
+const mockEvents: Event[] = [
+    {
+        id: 1,
+        name: 'Wagner Konzertabend',
+        date: '15. Mai 2026',
+        timeFrom: '19:00',
+        timeTo: '22:00',
+        notes: 'Live-Musikabend mit klassischen Wagner-Werken',
+    },
+    {
+        id: 2,
+        name: 'Firmenfeier TechCorp',
+        date: '18. Mai 2026',
+        timeFrom: '18:00',
+        timeTo: '23:00',
+        notes: 'Geschlossene Gesellschaft, vegetarisches Menü gewünscht',
+    },
+    {
+        id: 3,
+        name: 'Weinverkostung',
+        date: '22. Mai 2026',
+        timeFrom: '19:30',
+        timeTo: '21:30',
+    },
+    {
+        id: 4,
+        name: 'Hochzeitsfeier Schneider',
+        date: '25. Mai 2026',
+        timeFrom: '14:00',
+        timeTo: '22:00',
+        notes: 'Hochzeitsdinner mit Torte um 17:00',
     },
 ];
 
@@ -111,12 +154,15 @@ const mockMenuItems: MenuItem[] = [
 const categories = ['Alle', 'Vorspeisen', 'Hauptgerichte', 'Nachspeisen', 'Getränke', 'Beilagen'] as const;
 
 export default function Verwaltung() {
-    const [activeTab, setActiveTab] = useState<'reservierungen' | 'speisekarte'>('reservierungen');
+    const [activeTab, setActiveTab] = useState<'reservierungen' | 'veranstaltungen' | 'speisekarte'>('reservierungen');
     const [reservations, setReservations] = useState<Reservation[]>(mockReservations);
+    const [events, setEvents] = useState<Event[]>(mockEvents);
     const [menuItems, setMenuItems] = useState<MenuItem[]>(mockMenuItems);
     const [selectedCategory, setSelectedCategory] = useState<(typeof categories)[number]>('Alle');
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
+    const [isEventEditModalOpen, setIsEventEditModalOpen] = useState(false);
+    const [editingEvent, setEditingEvent] = useState<Event | null>(null);
     const [isMenuEditModalOpen, setIsMenuEditModalOpen] = useState(false);
     const [editingMenuItem, setEditingMenuItem] = useState<MenuItem | null>(null);
 
@@ -136,6 +182,25 @@ export default function Verwaltung() {
                 prevReservations.map((r) => (r.id === editingReservation.id ? editingReservation : r))
             );
             closeEditModal();
+        }
+    };
+
+    const openEventEditModal = (event: Event) => {
+        setEditingEvent({ ...event });
+        setIsEventEditModalOpen(true);
+    };
+
+    const closeEventEditModal = () => {
+        setIsEventEditModalOpen(false);
+        setEditingEvent(null);
+    };
+
+    const handleUpdateEvent = () => {
+        if (editingEvent) {
+            setEvents((prevEvents) =>
+                prevEvents.map((e) => (e.id === editingEvent.id ? editingEvent : e))
+            );
+            closeEventEditModal();
         }
     };
 
@@ -219,6 +284,17 @@ export default function Verwaltung() {
                                 Reservierungen
                             </button>
                             <button
+                                onClick={() => setActiveTab('veranstaltungen')}
+                                className={`flex items-center gap-2 px-6 py-3 text-base font-medium tracking-[-0.3125px] transition-colors ${
+                                    activeTab === 'veranstaltungen'
+                                        ? 'border-b-2 border-[#800020] text-[#800020]'
+                                        : 'border-b-2 border-transparent text-[#2d1b1b] hover:text-[#800020]'
+                                }`}
+                            >
+                                <img src="/icons/calendar-check.svg" alt="" className="h-4 w-4" />
+                                Veranstaltungen
+                            </button>
+                            <button
                                 onClick={() => setActiveTab('speisekarte')}
                                 className={`flex items-center gap-2 px-6 py-3 text-base font-medium tracking-[-0.3125px] transition-colors ${
                                     activeTab === 'speisekarte'
@@ -293,6 +369,76 @@ export default function Verwaltung() {
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={() => openEditModal(reservation)}
+                                                    className="rounded-[10px] p-2 text-[#2d1b1b] transition-colors hover:bg-gray-100"
+                                                    aria-label="Bearbeiten"
+                                                >
+                                                    <img src="/icons/edit.svg" alt="" className="h-4 w-4" />
+                                                </button>
+                                                <button
+                                                    className="rounded-[10px] p-2 text-[#800020] transition-colors hover:bg-gray-100"
+                                                    aria-label="Löschen"
+                                                >
+                                                    <img src="/icons/trash.svg" alt="" className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'veranstaltungen' && (
+                        <div className="mt-6 space-y-6">
+                            {/* Header with Add Button */}
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-xl font-medium text-[#2d1b1b] tracking-[-0.4492px]">
+                                    Veranstaltungen
+                                </h2>
+                                <button className="flex items-center gap-2 rounded-[10px] bg-[#800020] px-4 py-2 text-base font-medium text-white tracking-[-0.3125px] transition-colors hover:bg-[#600018]">
+                                    <img src="/icons/plus.svg" alt="" className="h-4 w-4" />
+                                    Veranstaltung hinzufügen
+                                </button>
+                            </div>
+
+                            {/* Events List */}
+                            <div className="space-y-3">
+                                {events.map((event) => (
+                                    <div
+                                        key={event.id}
+                                        className="rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-white p-4"
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex-1 space-y-2">
+                                                {/* Name */}
+                                                <h3 className="text-lg font-medium text-[#2d1b1b] tracking-[-0.4395px]">
+                                                    {event.name}
+                                                </h3>
+
+                                                {/* Date, Time */}
+                                                <div className="flex items-center gap-4 text-sm text-[#6b6b6b] tracking-[-0.1504px]">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <img src="/icons/calendar.svg" alt="" className="h-4 w-4" />
+                                                        {event.date}
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <img src="/icons/clock.svg" alt="" className="h-4 w-4" />
+                                                        {event.timeFrom} - {event.timeTo}
+                                                    </div>
+                                                </div>
+
+                                                {/* Notes */}
+                                                {event.notes && (
+                                                    <div className="rounded border-l-2 border-[#800020] bg-[rgba(247,231,206,0.5)] px-3 py-2 text-sm text-[#2d1b1b] tracking-[-0.1504px]">
+                                                        {event.notes}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Action Buttons */}
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => openEventEditModal(event)}
                                                     className="rounded-[10px] p-2 text-[#2d1b1b] transition-colors hover:bg-gray-100"
                                                     aria-label="Bearbeiten"
                                                 >
@@ -671,6 +817,120 @@ export default function Verwaltung() {
                                     </button>
                                     <button
                                         onClick={closeMenuEditModal}
+                                        className="rounded-[10px] border border-[rgba(128,0,32,0.15)] px-4 py-2.5 text-base font-medium text-[#2d1b1b] tracking-[-0.3125px] transition-colors hover:bg-gray-50"
+                                    >
+                                        Abbrechen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Edit Event Modal */}
+                {isEventEditModalOpen && editingEvent && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center">
+                        {/* Backdrop */}
+                        <div
+                            className="absolute inset-0 bg-black/50"
+                            onClick={closeEventEditModal}
+                        />
+
+                        {/* Modal */}
+                        <div className="relative z-10 w-full max-w-md rounded-[10px] bg-white p-6 shadow-xl">
+                            <h2 className="mb-4 text-xl font-medium text-[#2d1b1b] tracking-[-0.4492px]">
+                                Veranstaltung bearbeiten
+                            </h2>
+
+                            <div className="space-y-4">
+                                {/* Veranstaltungsname */}
+                                <div className="space-y-1.5">
+                                    <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                        Veranstaltungsname
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={editingEvent.name}
+                                        onChange={(e) =>
+                                            setEditingEvent({ ...editingEvent, name: e.target.value })
+                                        }
+                                        className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                    />
+                                </div>
+
+                                {/* Datum */}
+                                <div className="space-y-1.5">
+                                    <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                        Datum
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={editingEvent.date}
+                                        onChange={(e) =>
+                                            setEditingEvent({ ...editingEvent, date: e.target.value })
+                                        }
+                                        className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                    />
+                                </div>
+
+                                {/* Uhrzeit Von - Bis */}
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1.5">
+                                        <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                            Von
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={editingEvent.timeFrom}
+                                            onChange={(e) =>
+                                                setEditingEvent({ ...editingEvent, timeFrom: e.target.value })
+                                            }
+                                            placeholder="19:00"
+                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                            Bis
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={editingEvent.timeTo}
+                                            onChange={(e) =>
+                                                setEditingEvent({ ...editingEvent, timeTo: e.target.value })
+                                            }
+                                            placeholder="22:00"
+                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Notizen */}
+                                <div className="space-y-1.5">
+                                    <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                        Notizen (Optional)
+                                    </label>
+                                    <textarea
+                                        value={editingEvent.notes || ''}
+                                        onChange={(e) =>
+                                            setEditingEvent({ ...editingEvent, notes: e.target.value })
+                                        }
+                                        placeholder="Besondere Anforderungen, Programm, usw."
+                                        rows={3}
+                                        className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] placeholder:text-[rgba(45,27,27,0.5)] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none resize-none"
+                                    />
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="mt-6 flex gap-3">
+                                    <button
+                                        onClick={handleUpdateEvent}
+                                        className="flex-1 rounded-[10px] bg-[#800020] px-4 py-2.5 text-base font-medium text-white tracking-[-0.3125px] transition-colors hover:bg-[#600018]"
+                                    >
+                                        Veranstaltung aktualisieren
+                                    </button>
+                                    <button
+                                        onClick={closeEventEditModal}
                                         className="rounded-[10px] border border-[rgba(128,0,32,0.15)] px-4 py-2.5 text-base font-medium text-[#2d1b1b] tracking-[-0.3125px] transition-colors hover:bg-gray-50"
                                     >
                                         Abbrechen
