@@ -15,8 +15,8 @@ interface Event {
     id: number;
     name: string;
     date: string;
-    timeFrom: string;
-    timeTo: string;
+    time_from: string;
+    time_to: string;
     notes?: string;
 }
 
@@ -66,40 +66,6 @@ const mockReservations: Reservation[] = [
     },
 ];
 
-const mockEvents: Event[] = [
-    {
-        id: 1,
-        name: 'Wagner Konzertabend',
-        date: '15. Mai 2026',
-        timeFrom: '19:00',
-        timeTo: '22:00',
-        notes: 'Live-Musikabend mit klassischen Wagner-Werken',
-    },
-    {
-        id: 2,
-        name: 'Firmenfeier TechCorp',
-        date: '18. Mai 2026',
-        timeFrom: '18:00',
-        timeTo: '23:00',
-        notes: 'Geschlossene Gesellschaft, vegetarisches Menü gewünscht',
-    },
-    {
-        id: 3,
-        name: 'Weinverkostung',
-        date: '22. Mai 2026',
-        timeFrom: '19:30',
-        timeTo: '21:30',
-    },
-    {
-        id: 4,
-        name: 'Hochzeitsfeier Schneider',
-        date: '25. Mai 2026',
-        timeFrom: '14:00',
-        timeTo: '22:00',
-        notes: 'Hochzeitsdinner mit Torte um 17:00',
-    },
-];
-
 const categories = [
     'Alle',
     'Unsere geschützten Spezialitäten',
@@ -138,11 +104,11 @@ const categories = [
 interface VerwaltungProps {
     menuItems: MenuItem[];
     reservations: Reservation[];
+    events: Event[];
 }
 
-export default function Verwaltung({ menuItems = [], reservations = [] }: VerwaltungProps) {
+export default function Verwaltung({ menuItems = [], reservations = [], events = [] }: VerwaltungProps) {
     const [activeTab, setActiveTab] = useState<'reservierungen' | 'veranstaltungen' | 'speisekarte'>('reservierungen');
-    const [events, setEvents] = useState<Event[]>(mockEvents);
     const [selectedCategory, setSelectedCategory] = useState<(typeof categories)[number]>('Alle');
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
@@ -157,6 +123,14 @@ export default function Verwaltung({ menuItems = [], reservations = [] }: Verwal
     });
     const [isEventEditModalOpen, setIsEventEditModalOpen] = useState(false);
     const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+    const [isEventAddModalOpen, setIsEventAddModalOpen] = useState(false);
+    const [newEvent, setNewEvent] = useState<Omit<Event, 'id'>>({
+        name: '',
+        date: '',
+        time_from: '',
+        time_to: '',
+        notes: '',
+    });
     const [isMenuEditModalOpen, setIsMenuEditModalOpen] = useState(false);
     const [editingMenuItem, setEditingMenuItem] = useState<MenuItem | null>(null);
     const [isMenuAddModalOpen, setIsMenuAddModalOpen] = useState(false);
@@ -220,11 +194,31 @@ export default function Verwaltung({ menuItems = [], reservations = [] }: Verwal
 
     const handleUpdateEvent = () => {
         if (editingEvent) {
-            setEvents((prevEvents) =>
-                prevEvents.map((e) => (e.id === editingEvent.id ? editingEvent : e))
-            );
-            closeEventEditModal();
+            router.put(`/events/${editingEvent.id}`, editingEvent, {
+                onSuccess: () => closeEventEditModal(),
+            });
         }
+    };
+
+    const openEventAddModal = () => {
+        setIsEventAddModalOpen(true);
+    };
+
+    const closeEventAddModal = () => {
+        setIsEventAddModalOpen(false);
+        setNewEvent({
+            name: '',
+            date: '',
+            time_from: '',
+            time_to: '',
+            notes: '',
+        });
+    };
+
+    const handleAddEvent = () => {
+        router.post('/events', newEvent, {
+            onSuccess: () => closeEventAddModal(),
+        });
     };
 
     const openMenuEditModal = (menuItem: MenuItem) => {
@@ -439,7 +433,10 @@ export default function Verwaltung({ menuItems = [], reservations = [] }: Verwal
                                 <h2 className="text-xl font-medium text-[#2d1b1b] tracking-[-0.4492px]">
                                     Veranstaltungen
                                 </h2>
-                                <button className="flex items-center gap-2 rounded-[10px] bg-[#800020] px-4 py-2 text-base font-medium text-white tracking-[-0.3125px] transition-colors hover:bg-[#600018]">
+                                <button
+                                    onClick={openEventAddModal}
+                                    className="flex items-center gap-2 rounded-[10px] bg-[#800020] px-4 py-2 text-base font-medium text-white tracking-[-0.3125px] transition-colors hover:bg-[#600018]"
+                                >
                                     <img src="/icons/plus.svg" alt="" className="h-4 w-4" />
                                     Veranstaltung hinzufügen
                                 </button>
@@ -467,7 +464,7 @@ export default function Verwaltung({ menuItems = [], reservations = [] }: Verwal
                                                     </div>
                                                     <div className="flex items-center gap-1.5">
                                                         <img src="/icons/clock.svg" alt="" className="h-4 w-4" />
-                                                        {event.timeFrom} - {event.timeTo}
+                                                        {event.time_from} - {event.time_to}
                                                     </div>
                                                 </div>
 
@@ -1191,10 +1188,10 @@ export default function Verwaltung({ menuItems = [], reservations = [] }: Verwal
                                             Von
                                         </label>
                                         <input
-                                            type="text"
-                                            value={editingEvent.timeFrom}
+                                            type="time"
+                                            value={editingEvent.time_from}
                                             onChange={(e) =>
-                                                setEditingEvent({ ...editingEvent, timeFrom: e.target.value })
+                                                setEditingEvent({ ...editingEvent, time_from: e.target.value })
                                             }
                                             placeholder="19:00"
                                             className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
@@ -1205,10 +1202,10 @@ export default function Verwaltung({ menuItems = [], reservations = [] }: Verwal
                                             Bis
                                         </label>
                                         <input
-                                            type="text"
-                                            value={editingEvent.timeTo}
+                                            type="time"
+                                            value={editingEvent.time_to}
                                             onChange={(e) =>
-                                                setEditingEvent({ ...editingEvent, timeTo: e.target.value })
+                                                setEditingEvent({ ...editingEvent, time_to: e.target.value })
                                             }
                                             placeholder="22:00"
                                             className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
@@ -1216,10 +1213,10 @@ export default function Verwaltung({ menuItems = [], reservations = [] }: Verwal
                                     </div>
                                 </div>
 
-                                {/* Notizen */}
+                                {/* Beschreibung */}
                                 <div className="space-y-1.5">
                                     <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
-                                        Notizen (Optional)
+                                        Beschreibung (Optional)
                                     </label>
                                     <textarea
                                         value={editingEvent.notes || ''}
@@ -1242,6 +1239,121 @@ export default function Verwaltung({ menuItems = [], reservations = [] }: Verwal
                                     </button>
                                     <button
                                         onClick={closeEventEditModal}
+                                        className="rounded-[10px] border border-[rgba(128,0,32,0.15)] px-4 py-2.5 text-base font-medium text-[#2d1b1b] tracking-[-0.3125px] transition-colors hover:bg-gray-50"
+                                    >
+                                        Abbrechen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Add Event Modal */}
+                {isEventAddModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center">
+                        {/* Backdrop */}
+                        <div
+                            className="absolute inset-0 bg-black/50"
+                            onClick={closeEventAddModal}
+                        />
+
+                        {/* Modal */}
+                        <div className="relative z-10 w-full max-w-md rounded-[10px] bg-white p-6 shadow-xl">
+                            <h2 className="mb-4 text-xl font-medium text-[#2d1b1b] tracking-[-0.4492px]">
+                                Neue Veranstaltung
+                            </h2>
+
+                            <div className="space-y-4">
+                                {/* Veranstaltungsname */}
+                                <div className="space-y-1.5">
+                                    <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                        Veranstaltungsname
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={newEvent.name}
+                                        onChange={(e) =>
+                                            setNewEvent({ ...newEvent, name: e.target.value })
+                                        }
+                                        placeholder="z.B. Live Jazz Abend"
+                                        className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] placeholder:text-[rgba(45,27,27,0.5)] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                    />
+                                </div>
+
+                                {/* Datum */}
+                                <div className="space-y-1.5">
+                                    <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                        Datum
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={newEvent.date}
+                                        onChange={(e) =>
+                                            setNewEvent({ ...newEvent, date: e.target.value })
+                                        }
+                                        className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                    />
+                                </div>
+
+                                {/* Uhrzeit Von - Bis */}
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1.5">
+                                        <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                            Von
+                                        </label>
+                                        <input
+                                            type="time"
+                                            value={newEvent.time_from}
+                                            onChange={(e) =>
+                                                setNewEvent({ ...newEvent, time_from: e.target.value })
+                                            }
+                                            placeholder="19:00"
+                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] placeholder:text-[rgba(45,27,27,0.5)] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                            Bis
+                                        </label>
+                                        <input
+                                            type="time"
+                                            value={newEvent.time_to}
+                                            onChange={(e) =>
+                                                setNewEvent({ ...newEvent, time_to: e.target.value })
+                                            }
+                                            placeholder="22:00"
+                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] placeholder:text-[rgba(45,27,27,0.5)] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Beschreibung */}
+                                <div className="space-y-1.5">
+                                    <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                        Beschreibung (Optional)
+                                    </label>
+                                    <textarea
+                                        value={newEvent.notes || ''}
+                                        onChange={(e) =>
+                                            setNewEvent({ ...newEvent, notes: e.target.value })
+                                        }
+                                        placeholder="Besondere Anforderungen, Programm, usw."
+                                        rows={3}
+                                        className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] placeholder:text-[rgba(45,27,27,0.5)] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none resize-none"
+                                    />
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="mt-6 flex gap-3">
+                                    <button
+                                        onClick={handleAddEvent}
+                                        className="flex-1 rounded-[10px] bg-[#800020] px-4 py-2.5 text-base font-medium text-white tracking-[-0.3125px] transition-colors hover:bg-[#600018]"
+                                    >
+                                        Veranstaltung hinzufügen
+                                    </button>
+                                    <button
+                                        onClick={closeEventAddModal}
                                         className="rounded-[10px] border border-[rgba(128,0,32,0.15)] px-4 py-2.5 text-base font-medium text-[#2d1b1b] tracking-[-0.3125px] transition-colors hover:bg-gray-50"
                                     >
                                         Abbrechen
