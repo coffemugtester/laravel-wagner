@@ -148,7 +148,7 @@ h2 {
 }
 
 .two-col {
-  align-items: center;
+  align-items: start;
   display: grid;
   gap: 48px;
   grid-template-columns: 1fr 1fr;
@@ -159,6 +159,24 @@ h2 {
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 32px;
+  height: 608px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.two-col > div:first-child::after {
+  content: '';
+  position: sticky;
+  display: block;
+  bottom: -32px;
+  left: 0;
+  right: 0;
+  height: 120px;
+  margin: 0 -32px -32px -32px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.95) 70%, rgba(255, 255, 255, 1));
+  pointer-events: none;
+  border-radius: 0 0 10px 10px;
+  z-index: 1;
 }
 
 .two-col h2 {
