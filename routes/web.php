@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [MenuController::class, 'welcome'])->name('home');
 
+// Public reservation requests
+Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/verwaltung', [VerwaltungController::class, 'index'])->name('verwaltung');
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
@@ -17,7 +20,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/menu-items/{menuItem}', [MenuController::class, 'destroy'])->name('menu-items.destroy');
     Route::patch('/menu-items/{menuItem}/toggle', [MenuController::class, 'toggleAvailability'])->name('menu-items.toggle');
 
-    Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
     Route::put('/reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
     Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
 

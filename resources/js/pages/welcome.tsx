@@ -1,4 +1,5 @@
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
+import { useState } from 'react';
 import '../../css/wagner.css';
 
 interface MenuSection {
@@ -12,6 +13,40 @@ interface WelcomeProps {
 }
 
 export default function Welcome({ menuSections = [] }: WelcomeProps) {
+    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [reservationForm, setReservationForm] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        guests: '',
+        date: '',
+        time: '',
+    });
+
+    const handleSubmitReservation = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        router.post('/reservations', {
+            name: reservationForm.name,
+            phone: reservationForm.phone,
+            guests: parseInt(reservationForm.guests) || 1,
+            date: reservationForm.date,
+            time: reservationForm.time,
+            notes: reservationForm.email ? `E-Mail: ${reservationForm.email}` : '',
+        }, {
+            onSuccess: () => {
+                setShowConfirmation(true);
+                setReservationForm({
+                    name: '',
+                    email: '',
+                    phone: '',
+                    guests: '',
+                    date: '',
+                    time: '',
+                });
+            },
+        });
+    };
     return (
         <>
             <Head title="Café Wagner">
@@ -188,18 +223,52 @@ export default function Welcome({ menuSections = [] }: WelcomeProps) {
                     <div className="reservation container">
                         <h2>Reservierung</h2>
                         <p className="caption">
-                            Reservieren Sie Ihren Tisch fur ein unvergessliches
-                            Erlebnis
+                            Senden Sie uns eine Reservierungsanfrage - wir melden uns zeitnah zur Bestätigung
                         </p>
-                        <form className="reservation-form">
-                            <input placeholder="Name" />
-                            <input placeholder="E-Mail" />
-                            <input placeholder="Telefon" />
-                            <input placeholder="Anzahl der Gaste" />
-                            <input placeholder="Datum" />
-                            <input placeholder="Uhrzeit" />
-                            <button className="button" type="button">
-                                Jetzt reservieren
+                        <form className="reservation-form" onSubmit={handleSubmitReservation}>
+                            <input
+                                placeholder="Name"
+                                value={reservationForm.name}
+                                onChange={(e) => setReservationForm({ ...reservationForm, name: e.target.value })}
+                                required
+                            />
+                            <input
+                                type="email"
+                                placeholder="E-Mail"
+                                value={reservationForm.email}
+                                onChange={(e) => setReservationForm({ ...reservationForm, email: e.target.value })}
+                            />
+                            <input
+                                type="tel"
+                                placeholder="Telefon"
+                                value={reservationForm.phone}
+                                onChange={(e) => setReservationForm({ ...reservationForm, phone: e.target.value })}
+                                required
+                            />
+                            <input
+                                type="number"
+                                min="1"
+                                placeholder="Anzahl der Gäste"
+                                value={reservationForm.guests}
+                                onChange={(e) => setReservationForm({ ...reservationForm, guests: e.target.value })}
+                                required
+                            />
+                            <input
+                                type="date"
+                                placeholder="Datum"
+                                value={reservationForm.date}
+                                onChange={(e) => setReservationForm({ ...reservationForm, date: e.target.value })}
+                                required
+                            />
+                            <input
+                                type="time"
+                                placeholder="Uhrzeit"
+                                value={reservationForm.time}
+                                onChange={(e) => setReservationForm({ ...reservationForm, time: e.target.value })}
+                                required
+                            />
+                            <button className="button" type="submit">
+                                Reservierungsanfrage senden
                             </button>
                         </form>
                         <p className="contact-line">0341 99 99 49 48</p>
@@ -232,6 +301,90 @@ export default function Welcome({ menuSections = [] }: WelcomeProps) {
                         </div>
                     </div>
                 </footer>
+
+                {/* Confirmation Modal */}
+                {showConfirmation && (
+                    <div
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 9999,
+                        }}
+                        onClick={() => setShowConfirmation(false)}
+                    >
+                        <div
+                            style={{
+                                backgroundColor: '#faf8f5',
+                                borderRadius: '10px',
+                                padding: '40px',
+                                maxWidth: '500px',
+                                width: '90%',
+                                textAlign: 'center',
+                                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div
+                                style={{
+                                    fontSize: '48px',
+                                    marginBottom: '20px',
+                                }}
+                            >
+                                ✓
+                            </div>
+                            <h2
+                                style={{
+                                    fontFamily: "'Cinzel', serif",
+                                    fontSize: '24px',
+                                    marginBottom: '20px',
+                                    color: '#800020',
+                                }}
+                            >
+                                Reservierungsanfrage erhalten
+                            </h2>
+                            <p
+                                style={{
+                                    fontFamily: "'Cormorant Garamond', serif",
+                                    fontSize: '18px',
+                                    lineHeight: '1.6',
+                                    marginBottom: '30px',
+                                    color: '#2d1b1b',
+                                }}
+                            >
+                                Vielen Dank für Ihre Anfrage! Wir haben Ihre Reservierungsdaten erhalten und werden uns zeitnah bei Ihnen melden, um die Reservierung zu bestätigen.
+                            </p>
+                            <button
+                                onClick={() => setShowConfirmation(false)}
+                                style={{
+                                    backgroundColor: '#800020',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '10px',
+                                    padding: '12px 32px',
+                                    fontSize: '16px',
+                                    fontFamily: "'Cormorant Garamond', serif",
+                                    cursor: 'pointer',
+                                    transition: 'background-color 0.3s',
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#600018';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#800020';
+                                }}
+                            >
+                                Verstanden
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </>
     );
