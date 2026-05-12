@@ -13,6 +13,7 @@ class Reservation extends Model
         'guests',
         'phone',
         'notes',
+        'processed',
     ];
 
     protected function casts(): array
@@ -20,6 +21,7 @@ class Reservation extends Model
         return [
             'date' => 'date',
             'time' => 'datetime:H:i',
+            'processed' => 'boolean',
         ];
     }
 }

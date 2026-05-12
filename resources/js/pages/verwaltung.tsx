@@ -9,6 +9,7 @@ interface Reservation {
     guests: number;
     phone: string;
     notes?: string;
+    processed: boolean;
 }
 
 interface Event {
@@ -180,6 +181,10 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
         router.post('/reservations', newReservation, {
             onSuccess: () => closeReservationAddModal(),
         });
+    };
+
+    const toggleReservationProcessed = (id: number) => {
+        router.patch(`/reservations/${id}/toggle`);
     };
 
     const openEventEditModal = (event: Event) => {
@@ -360,9 +365,17 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
                                 </button>
                             </div>
 
-                            {/* Reservations List */}
+                            {/* Pending Reservations */}
                             <div className="space-y-3">
-                                {reservations.map((reservation) => (
+                                <h3 className="text-lg font-medium text-[#800020] tracking-[-0.4395px]">
+                                    Offene Anfragen
+                                </h3>
+                                {reservations.filter(r => !r.processed).length === 0 ? (
+                                    <p className="text-sm text-[#6b6b6b] tracking-[-0.1504px]">
+                                        Keine offenen Anfragen
+                                    </p>
+                                ) : (
+                                    reservations.filter(r => !r.processed).map((reservation) => (
                                     <div
                                         key={reservation.id}
                                         className="rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-white p-4"
@@ -404,24 +417,128 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
                                             </div>
 
                                             {/* Action Buttons */}
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => openEditModal(reservation)}
-                                                    className="rounded-[10px] p-2 text-[#2d1b1b] transition-colors hover:bg-gray-100"
-                                                    aria-label="Bearbeiten"
-                                                >
-                                                    <img src="/icons/edit.svg" alt="" className="h-4 w-4" />
-                                                </button>
-                                                <button
-                                                    className="rounded-[10px] p-2 text-[#800020] transition-colors hover:bg-gray-100"
-                                                    aria-label="Löschen"
-                                                >
-                                                    <img src="/icons/trash.svg" alt="" className="h-4 w-4" />
-                                                </button>
+                                            <div className="flex flex-col gap-3">
+                                                {/* Processed Checkbox */}
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={reservation.processed}
+                                                        onChange={() => toggleReservationProcessed(reservation.id)}
+                                                        className="h-4 w-4 rounded border-[rgba(128,0,32,0.15)] text-[#800020] focus:ring-[#800020]"
+                                                    />
+                                                    <span className="text-sm text-[#2d1b1b] tracking-[-0.1504px]">
+                                                        Bearbeitet
+                                                    </span>
+                                                </label>
+
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => openEditModal(reservation)}
+                                                        className="rounded-[10px] p-2 text-[#2d1b1b] transition-colors hover:bg-gray-100"
+                                                        aria-label="Bearbeiten"
+                                                    >
+                                                        <img src="/icons/edit.svg" alt="" className="h-4 w-4" />
+                                                    </button>
+                                                    <button
+                                                        className="rounded-[10px] p-2 text-[#800020] transition-colors hover:bg-gray-100"
+                                                        aria-label="Löschen"
+                                                    >
+                                                        <img src="/icons/trash.svg" alt="" className="h-4 w-4" />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                ))}
+                                ))
+                                )}
+                            </div>
+
+                            {/* Processed Reservations */}
+                            <div className="space-y-3">
+                                <h3 className="text-lg font-medium text-[#2d1b1b] tracking-[-0.4395px]">
+                                    Bearbeitete Reservierungen
+                                </h3>
+                                {reservations.filter(r => r.processed).length === 0 ? (
+                                    <p className="text-sm text-[#6b6b6b] tracking-[-0.1504px]">
+                                        Keine bearbeiteten Reservierungen
+                                    </p>
+                                ) : (
+                                    reservations.filter(r => r.processed).map((reservation) => (
+                                    <div
+                                        key={reservation.id}
+                                        className="rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-white p-4 opacity-60"
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex-1 space-y-2">
+                                                {/* Name */}
+                                                <h3 className="text-lg font-medium text-[#2d1b1b] tracking-[-0.4395px]">
+                                                    {reservation.name}
+                                                </h3>
+
+                                                {/* Date, Time, Guests */}
+                                                <div className="flex items-center gap-4 text-sm text-[#6b6b6b] tracking-[-0.1504px]">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <img src="/icons/calendar.svg" alt="" className="h-4 w-4" />
+                                                        {reservation.date}
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <img src="/icons/clock.svg" alt="" className="h-4 w-4" />
+                                                        {reservation.time}
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <img src="/icons/users.svg" alt="" className="h-4 w-4" />
+                                                        {reservation.guests} Gäste
+                                                    </div>
+                                                </div>
+
+                                                {/* Phone */}
+                                                <div className="text-sm text-[#6b6b6b] tracking-[-0.1504px]">
+                                                    {reservation.phone}
+                                                </div>
+
+                                                {/* Notes */}
+                                                {reservation.notes && (
+                                                    <div className="rounded border-l-2 border-[#800020] bg-[rgba(247,231,206,0.5)] px-3 py-2 text-sm text-[#2d1b1b] tracking-[-0.1504px]">
+                                                        {reservation.notes}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Action Buttons */}
+                                            <div className="flex flex-col gap-3">
+                                                {/* Processed Checkbox */}
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={reservation.processed}
+                                                        onChange={() => toggleReservationProcessed(reservation.id)}
+                                                        className="h-4 w-4 rounded border-[rgba(128,0,32,0.15)] text-[#800020] focus:ring-[#800020]"
+                                                    />
+                                                    <span className="text-sm text-[#2d1b1b] tracking-[-0.1504px]">
+                                                        Bearbeitet
+                                                    </span>
+                                                </label>
+
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => openEditModal(reservation)}
+                                                        className="rounded-[10px] p-2 text-[#2d1b1b] transition-colors hover:bg-gray-100"
+                                                        aria-label="Bearbeiten"
+                                                    >
+                                                        <img src="/icons/edit.svg" alt="" className="h-4 w-4" />
+                                                    </button>
+                                                    <button
+                                                        className="rounded-[10px] p-2 text-[#800020] transition-colors hover:bg-gray-100"
+                                                        aria-label="Löschen"
+                                                    >
+                                                        <img src="/icons/trash.svg" alt="" className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                                )}
                             </div>
                         </div>
                     )}

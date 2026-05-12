@@ -46,4 +46,11 @@ class ReservationController extends Controller
 
         return redirect()->back();
     }
+
+    public function toggleProcessed(Reservation $reservation): RedirectResponse
+    {
+        $reservation->update(['processed' => ! $reservation->processed]);
+
+        return redirect()->back();
+    }
 }
