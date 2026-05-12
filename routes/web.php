@@ -1,15 +1,25 @@
 <?php
 
+use App\Http\Controllers\MenuController;
+use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\VerwaltungController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
-Route::inertia('/', 'welcome', [
-    'canRegister' => Features::enabled(Features::registration()),
-])->name('home');
+Route::get('/', [MenuController::class, 'welcome'])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('/verwaltung', 'verwaltung')->name('verwaltung');
+    Route::get('/verwaltung', [VerwaltungController::class, 'index'])->name('verwaltung');
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
+
+    Route::post('/menu-items', [MenuController::class, 'store'])->name('menu-items.store');
+    Route::put('/menu-items/{menuItem}', [MenuController::class, 'update'])->name('menu-items.update');
+    Route::delete('/menu-items/{menuItem}', [MenuController::class, 'destroy'])->name('menu-items.destroy');
+    Route::patch('/menu-items/{menuItem}/toggle', [MenuController::class, 'toggleAvailability'])->name('menu-items.toggle');
+
+    Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
+    Route::put('/reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
+    Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
 });
 
 require __DIR__.'/settings.php';

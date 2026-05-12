@@ -1,70 +1,17 @@
 import { Head } from '@inertiajs/react';
 import '../../css/wagner.css';
 
-const menuSections = [
-    {
-        title: 'Unsere geschützten Spezialitäten',
-        subtitle: '',
-        items: [
-            [
-                'Żurek',
-                'Herzhafte polnische Mehlsuppe mit Würstchen und Kartoffeln',
-                '€8,90',
-            ],
-            [
-                'Bigos',
-                'Krauteintopf aus gedunstetem Sauerkraut mit verschieden Fleisch und Wurstsorten',
-                '€10,90',
-            ],
-            [
-                'Pierogi Ruskie',
-                'Teigtaschen gefüllt mit Quark und Kartoffeln',
-                '€12,90',
-            ],
-        ],
-    },
-    {
-        title: 'Frühstück',
-        subtitle: '',
-        items: [
-            [
-                'Sweet',
-                'zwei Buttercroissant, Marmelade, Honig, Nutella, Butter und verschiedene Brotsorten',
-                '€10,90',
-            ],
-            [
-                'Ideal',
-                'Parmaschinken, Coppa, Salami, Emmentaler, Ei, Marmelade, Butter und verschiedene Brotsorten',
-                '€14,90',
-            ],
-            [
-                'Formaggio',
-                'verschiedene Käsesorten, Buttermilch, Butter und verschiedene Brotsorten',
-                '€14,90',
-            ],
-            [
-                'Toskana',
-                'Parmaschinken, Coppa, Caprese, Antipasti und verschiedene Brotsorten',
-                '€14,90',
-            ],
-        ],
-    },
-    {
-        title: 'Salate',
-        subtitle: '',
-        items: [
-            [
-                'Gemischter Salat',
-                'mit Hähnchenstreifen und Hausdressing',
-                '€14,90',
-            ],
-            ['Caprese', 'mit Tomaten, Mozarella und Olivenöl', '€9,90'],
-            ['Rucola', 'mit Ziegenkäse, Walnüssen und Hausdressing', '€14,90'],
-        ],
-    },
-];
+interface MenuSection {
+    title: string;
+    subtitle: string;
+    items: [string, string, string][];
+}
 
-export default function Welcome() {
+interface WelcomeProps {
+    menuSections: MenuSection[];
+}
+
+export default function Welcome({ menuSections = [] }: WelcomeProps) {
     return (
         <>
             <Head title="Café Wagner">

@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 
 interface Reservation {
@@ -23,8 +23,8 @@ interface Event {
 interface MenuItem {
     id: number;
     name: string;
-    category: 'Vorspeisen' | 'Hauptgerichte' | 'Nachspeisen' | 'Getränke' | 'Beilagen';
-    price: number;
+    category: string;
+    price: number | string;
     description: string;
     available: boolean;
 }
@@ -100,71 +100,73 @@ const mockEvents: Event[] = [
     },
 ];
 
-const mockMenuItems: MenuItem[] = [
-    {
-        id: 1,
-        name: 'Caesar Salat',
-        category: 'Vorspeisen',
-        price: 14.0,
-        description: 'Römersalat, Parmesan, Croutons, klassisches Caesar-Dressing',
-        available: true,
-    },
-    {
-        id: 2,
-        name: 'Französische Zwiebelsuppe',
-        category: 'Vorspeisen',
-        price: 12.0,
-        description: 'Karamellisierte Zwiebeln, Rinderbrühe, Gruyère-Käse, Crostini',
-        available: true,
-    },
-    {
-        id: 3,
-        name: 'Filet Mignon',
-        category: 'Hauptgerichte',
-        price: 48.0,
-        description: '220g Rinderfilet mit Rotweinreduktion',
-        available: true,
-    },
-    {
-        id: 4,
-        name: 'Gebratener Lachs',
-        category: 'Hauptgerichte',
-        price: 36.0,
-        description: 'Atlantiklachs mit Zitronen-Butter-Sauce und Saisongemüse',
-        available: true,
-    },
-    {
-        id: 5,
-        name: 'Crème Brûlée',
-        category: 'Nachspeisen',
-        price: 10.0,
-        description: 'Klassische Vanillecreme mit karamellisierter Zuckerkruste',
-        available: true,
-    },
-    {
-        id: 6,
-        name: 'Schokoladen-Lava-Kuchen',
-        category: 'Nachspeisen',
-        price: 12.0,
-        description: 'Warmer Schokoladenkuchen mit flüssigem Kern, Vanilleeis',
-        available: false,
-    },
-];
+const categories = [
+    'Alle',
+    'Unsere geschützten Spezialitäten',
+    'Frühstück',
+    'Sandwich',
+    'Suppen',
+    'Salate',
+    'Anti Pasta',
+    'Sweets und Crepes',
+    'Kuchen und Torten',
+    'Heiße Getränke',
+    'Teekarte',
+    'Alkoholfreie Getränke',
+    'Säfte, Nektare, Fruchtsäfte',
+    'Biere',
+    'Sekt - Champagner - Prosecco',
+    'Aperitif',
+    'Weissweine',
+    'Rotweine',
+    'Likör',
+    'Gin',
+    'Tequila',
+    'Scotch Whiskey',
+    'Irish Whiskey',
+    'Malt Whiskey',
+    'American Whiskey',
+    'Bitter',
+    'Digestif',
+    'Grappa',
+    'Rum',
+    'Klare und Brände',
+    'Cocktails and Drinks',
+    'Non Alcoholic Drinks',
+] as const;
 
-const categories = ['Alle', 'Vorspeisen', 'Hauptgerichte', 'Nachspeisen', 'Getränke', 'Beilagen'] as const;
+interface VerwaltungProps {
+    menuItems: MenuItem[];
+    reservations: Reservation[];
+}
 
-export default function Verwaltung() {
+export default function Verwaltung({ menuItems = [], reservations = [] }: VerwaltungProps) {
     const [activeTab, setActiveTab] = useState<'reservierungen' | 'veranstaltungen' | 'speisekarte'>('reservierungen');
-    const [reservations, setReservations] = useState<Reservation[]>(mockReservations);
     const [events, setEvents] = useState<Event[]>(mockEvents);
-    const [menuItems, setMenuItems] = useState<MenuItem[]>(mockMenuItems);
     const [selectedCategory, setSelectedCategory] = useState<(typeof categories)[number]>('Alle');
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
+    const [isReservationAddModalOpen, setIsReservationAddModalOpen] = useState(false);
+    const [newReservation, setNewReservation] = useState<Omit<Reservation, 'id'>>({
+        name: '',
+        date: '',
+        time: '',
+        guests: 2,
+        phone: '',
+        notes: '',
+    });
     const [isEventEditModalOpen, setIsEventEditModalOpen] = useState(false);
     const [editingEvent, setEditingEvent] = useState<Event | null>(null);
     const [isMenuEditModalOpen, setIsMenuEditModalOpen] = useState(false);
     const [editingMenuItem, setEditingMenuItem] = useState<MenuItem | null>(null);
+    const [isMenuAddModalOpen, setIsMenuAddModalOpen] = useState(false);
+    const [newMenuItem, setNewMenuItem] = useState<Omit<MenuItem, 'id'>>({
+        name: '',
+        category: categories[1], // First non-"Alle" category
+        price: 0,
+        description: '',
+        available: true,
+    });
 
     const openEditModal = (reservation: Reservation) => {
         setEditingReservation({ ...reservation });
@@ -178,11 +180,32 @@ export default function Verwaltung() {
 
     const handleUpdateReservation = () => {
         if (editingReservation) {
-            setReservations((prevReservations) =>
-                prevReservations.map((r) => (r.id === editingReservation.id ? editingReservation : r))
-            );
-            closeEditModal();
+            router.put(`/reservations/${editingReservation.id}`, editingReservation, {
+                onSuccess: () => closeEditModal(),
+            });
         }
+    };
+
+    const openReservationAddModal = () => {
+        setIsReservationAddModalOpen(true);
+    };
+
+    const closeReservationAddModal = () => {
+        setIsReservationAddModalOpen(false);
+        setNewReservation({
+            name: '',
+            date: '',
+            time: '',
+            guests: 2,
+            phone: '',
+            notes: '',
+        });
+    };
+
+    const handleAddReservation = () => {
+        router.post('/reservations', newReservation, {
+            onSuccess: () => closeReservationAddModal(),
+        });
     };
 
     const openEventEditModal = (event: Event) => {
@@ -216,17 +239,35 @@ export default function Verwaltung() {
 
     const handleUpdateMenuItem = () => {
         if (editingMenuItem) {
-            setMenuItems((prevItems) =>
-                prevItems.map((item) => (item.id === editingMenuItem.id ? editingMenuItem : item))
-            );
-            closeMenuEditModal();
+            router.put(`/menu-items/${editingMenuItem.id}`, editingMenuItem, {
+                onSuccess: () => closeMenuEditModal(),
+            });
         }
     };
 
+    const openMenuAddModal = () => {
+        setIsMenuAddModalOpen(true);
+    };
+
+    const closeMenuAddModal = () => {
+        setIsMenuAddModalOpen(false);
+        setNewMenuItem({
+            name: '',
+            category: categories[1],
+            price: 0,
+            description: '',
+            available: true,
+        });
+    };
+
+    const handleAddMenuItem = () => {
+        router.post('/menu-items', newMenuItem, {
+            onSuccess: () => closeMenuAddModal(),
+        });
+    };
+
     const toggleAvailability = (id: number) => {
-        setMenuItems((items) =>
-            items.map((item) => (item.id === id ? { ...item, available: !item.available } : item))
-        );
+        router.patch(`/menu-items/${id}/toggle`);
     };
 
     const filteredMenuItems =
@@ -316,7 +357,10 @@ export default function Verwaltung() {
                                 <h2 className="text-xl font-medium text-[#2d1b1b] tracking-[-0.4492px]">
                                     Reservierungen
                                 </h2>
-                                <button className="flex items-center gap-2 rounded-[10px] bg-[#800020] px-4 py-2 text-base font-medium text-white tracking-[-0.3125px] transition-colors hover:bg-[#600018]">
+                                <button
+                                    onClick={openReservationAddModal}
+                                    className="flex items-center gap-2 rounded-[10px] bg-[#800020] px-4 py-2 text-base font-medium text-white tracking-[-0.3125px] transition-colors hover:bg-[#600018]"
+                                >
                                     <img src="/icons/plus.svg" alt="" className="h-4 w-4" />
                                     Reservierung hinzufügen
                                 </button>
@@ -465,7 +509,10 @@ export default function Verwaltung() {
                                 <h2 className="text-xl font-medium text-[#2d1b1b] tracking-[-0.4492px]">
                                     Speisekarte
                                 </h2>
-                                <button className="flex items-center gap-2 rounded-[10px] bg-[#800020] px-4 py-2 text-base font-medium text-white tracking-[-0.3125px] transition-colors hover:bg-[#600018]">
+                                <button
+                                    onClick={openMenuAddModal}
+                                    className="flex items-center gap-2 rounded-[10px] bg-[#800020] px-4 py-2 text-base font-medium text-white tracking-[-0.3125px] transition-colors hover:bg-[#600018]"
+                                >
                                     <img src="/icons/plus.svg" alt="" className="h-4 w-4" />
                                     Artikel hinzufügen
                                 </button>
@@ -522,7 +569,7 @@ export default function Verwaltung() {
                                                         </div>
                                                         <div className="flex items-center gap-1 text-base text-[#800020] tracking-[-0.3125px]">
                                                             <img src="/icons/euro.svg" alt="€" className="h-4 w-4" />
-                                                            {item.price.toFixed(2)}
+                                                            {typeof item.price === 'number' ? item.price.toFixed(2) : item.price}
                                                         </div>
                                                     </div>
 
@@ -699,6 +746,140 @@ export default function Verwaltung() {
                     </div>
                 )}
 
+                {/* Add Reservation Modal */}
+                {isReservationAddModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center">
+                        {/* Backdrop */}
+                        <div
+                            className="absolute inset-0 bg-black/50"
+                            onClick={closeReservationAddModal}
+                        />
+
+                        {/* Modal */}
+                        <div className="relative z-10 w-full max-w-md rounded-[10px] bg-white p-6 shadow-xl">
+                            <h2 className="mb-4 text-xl font-medium text-[#2d1b1b] tracking-[-0.4492px]">
+                                Neue Reservierung
+                            </h2>
+
+                            <div className="space-y-4">
+                                {/* Name */}
+                                <div className="space-y-1.5">
+                                    <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                        Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={newReservation.name}
+                                        onChange={(e) =>
+                                            setNewReservation({ ...newReservation, name: e.target.value })
+                                        }
+                                        placeholder="z.B. Max Mustermann"
+                                        className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] placeholder:text-[rgba(45,27,27,0.5)] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                    />
+                                </div>
+
+                                {/* Datum and Uhrzeit */}
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1.5">
+                                        <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                            Datum
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={newReservation.date}
+                                            onChange={(e) =>
+                                                setNewReservation({ ...newReservation, date: e.target.value })
+                                            }
+                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                            Uhrzeit
+                                        </label>
+                                        <input
+                                            type="time"
+                                            value={newReservation.time}
+                                            onChange={(e) =>
+                                                setNewReservation({ ...newReservation, time: e.target.value })
+                                            }
+                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Anzahl der Gäste */}
+                                <div className="space-y-1.5">
+                                    <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                        Anzahl der Gäste
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={newReservation.guests}
+                                        onChange={(e) =>
+                                            setNewReservation({
+                                                ...newReservation,
+                                                guests: parseInt(e.target.value) || 1,
+                                            })
+                                        }
+                                        placeholder="2"
+                                        className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] placeholder:text-[rgba(45,27,27,0.5)] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                    />
+                                </div>
+
+                                {/* Telefonnummer */}
+                                <div className="space-y-1.5">
+                                    <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                        Telefonnummer
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        value={newReservation.phone}
+                                        onChange={(e) =>
+                                            setNewReservation({ ...newReservation, phone: e.target.value })
+                                        }
+                                        placeholder="+49 123 456789"
+                                        className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] placeholder:text-[rgba(45,27,27,0.5)] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                    />
+                                </div>
+
+                                {/* Notizen */}
+                                <div className="space-y-1.5">
+                                    <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                        Notizen (Optional)
+                                    </label>
+                                    <textarea
+                                        value={newReservation.notes || ''}
+                                        onChange={(e) =>
+                                            setNewReservation({ ...newReservation, notes: e.target.value })
+                                        }
+                                        placeholder="Sonderwünsche, Allergien, usw."
+                                        rows={3}
+                                        className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] placeholder:text-[rgba(45,27,27,0.5)] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none resize-none"
+                                    />
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="mt-6 flex gap-3">
+                                    <button
+                                        onClick={handleAddReservation}
+                                        className="flex-1 rounded-[10px] bg-[#800020] px-4 py-2.5 text-base font-medium text-white tracking-[-0.3125px] transition-colors hover:bg-[#600018]"
+                                    >
+                                        Reservierung hinzufügen
+                                    </button>
+                                    <button
+                                        onClick={closeReservationAddModal}
+                                        className="rounded-[10px] border border-[rgba(128,0,32,0.15)] px-4 py-2.5 text-base font-medium text-[#2d1b1b] tracking-[-0.3125px] transition-colors hover:bg-gray-50"
+                                    >
+                                        Abbrechen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Edit Menu Item Modal */}
                 {isMenuEditModalOpen && editingMenuItem && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -741,16 +922,16 @@ export default function Verwaltung() {
                                             onChange={(e) =>
                                                 setEditingMenuItem({
                                                     ...editingMenuItem,
-                                                    category: e.target.value as MenuItem['category'],
+                                                    category: e.target.value,
                                                 })
                                             }
                                             className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
                                         >
-                                            <option value="Vorspeisen">Vorspeisen</option>
-                                            <option value="Hauptgerichte">Hauptgerichte</option>
-                                            <option value="Nachspeisen">Nachspeisen</option>
-                                            <option value="Getränke">Getränke</option>
-                                            <option value="Beilagen">Beilagen</option>
+                                            {categories.filter(c => c !== 'Alle').map((category) => (
+                                                <option key={category} value={category}>
+                                                    {category}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
                                     <div className="space-y-1.5">
@@ -817,6 +998,136 @@ export default function Verwaltung() {
                                     </button>
                                     <button
                                         onClick={closeMenuEditModal}
+                                        className="rounded-[10px] border border-[rgba(128,0,32,0.15)] px-4 py-2.5 text-base font-medium text-[#2d1b1b] tracking-[-0.3125px] transition-colors hover:bg-gray-50"
+                                    >
+                                        Abbrechen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Add Menu Item Modal */}
+                {isMenuAddModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center">
+                        {/* Backdrop */}
+                        <div
+                            className="absolute inset-0 bg-black/50"
+                            onClick={closeMenuAddModal}
+                        />
+
+                        {/* Modal */}
+                        <div className="relative z-10 w-full max-w-md rounded-[10px] bg-white p-6 shadow-xl">
+                            <h2 className="mb-4 text-xl font-medium text-[#2d1b1b] tracking-[-0.4492px]">
+                                Artikel hinzufügen
+                            </h2>
+
+                            <div className="space-y-4">
+                                {/* Artikelname */}
+                                <div className="space-y-1.5">
+                                    <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                        Artikelname
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={newMenuItem.name}
+                                        onChange={(e) =>
+                                            setNewMenuItem({ ...newMenuItem, name: e.target.value })
+                                        }
+                                        placeholder="z.B. Caesar Salat"
+                                        className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] placeholder:text-[rgba(45,27,27,0.5)] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                    />
+                                </div>
+
+                                {/* Kategorie and Preis */}
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1.5">
+                                        <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                            Kategorie
+                                        </label>
+                                        <select
+                                            value={newMenuItem.category}
+                                            onChange={(e) =>
+                                                setNewMenuItem({
+                                                    ...newMenuItem,
+                                                    category: e.target.value,
+                                                })
+                                            }
+                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                        >
+                                            {categories.filter(c => c !== 'Alle').map((category) => (
+                                                <option key={category} value={category}>
+                                                    {category}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                            Preis (€)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            value={newMenuItem.price}
+                                            onChange={(e) =>
+                                                setNewMenuItem({
+                                                    ...newMenuItem,
+                                                    price: parseFloat(e.target.value) || 0,
+                                                })
+                                            }
+                                            placeholder="0.00"
+                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] placeholder:text-[rgba(45,27,27,0.5)] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Beschreibung */}
+                                <div className="space-y-1.5">
+                                    <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                        Beschreibung
+                                    </label>
+                                    <textarea
+                                        value={newMenuItem.description}
+                                        onChange={(e) =>
+                                            setNewMenuItem({ ...newMenuItem, description: e.target.value })
+                                        }
+                                        placeholder="Gericht beschreiben"
+                                        rows={3}
+                                        className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] placeholder:text-[rgba(45,27,27,0.5)] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none resize-none"
+                                    />
+                                </div>
+
+                                {/* Verfügbar zum Bestellen */}
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        id="available-checkbox-add"
+                                        checked={newMenuItem.available}
+                                        onChange={(e) =>
+                                            setNewMenuItem({ ...newMenuItem, available: e.target.checked })
+                                        }
+                                        className="h-4 w-4 rounded border-[rgba(128,0,32,0.15)] text-[#800020] focus:ring-[#800020]"
+                                    />
+                                    <label
+                                        htmlFor="available-checkbox-add"
+                                        className="text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]"
+                                    >
+                                        Verfügbar zum Bestellen
+                                    </label>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="mt-6 flex gap-3">
+                                    <button
+                                        onClick={handleAddMenuItem}
+                                        className="flex-1 rounded-[10px] bg-[#800020] px-4 py-2.5 text-base font-medium text-white tracking-[-0.3125px] transition-colors hover:bg-[#600018]"
+                                    >
+                                        Artikel hinzufügen
+                                    </button>
+                                    <button
+                                        onClick={closeMenuAddModal}
                                         className="rounded-[10px] border border-[rgba(128,0,32,0.15)] px-4 py-2.5 text-base font-medium text-[#2d1b1b] tracking-[-0.3125px] transition-colors hover:bg-gray-50"
                                     >
                                         Abbrechen
