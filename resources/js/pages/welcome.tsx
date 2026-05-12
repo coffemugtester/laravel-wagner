@@ -73,7 +73,7 @@ export default function Welcome() {
                     href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
                 />
             </Head>
-            <div className="page">
+            <div className="wagner-page page">
                 <header className="nav">
                     <div className="logo">WAGNER</div>
                     <nav>
