@@ -9,12 +9,13 @@ import { send } from '@/routes/verification';
 export default function VerifyEmail({ status }: { status?: string }) {
     return (
         <>
-            <Head title="Email verification" />
+            <Head title="E-Mail-Verifizierung">
+                <link rel="icon" href="/wagner_logo.jpg" type="image/jpeg" />
+            </Head>
 
             {status === 'verification-link-sent' && (
                 <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    A new verification link has been sent to the email address
-                    you provided during registration.
+                    Ein neuer Verifizierungslink wurde an die E-Mail-Adresse gesendet, die Sie bei der Registrierung angegeben haben.
                 </div>
             )}
 
@@ -23,14 +24,14 @@ export default function VerifyEmail({ status }: { status?: string }) {
                     <>
                         <Button disabled={processing} variant="secondary">
                             {processing && <Spinner />}
-                            Resend verification email
+                            Verifizierungs-E-Mail erneut senden
                         </Button>
 
                         <TextLink
                             href={logout()}
                             className="mx-auto block text-sm"
                         >
-                            Log out
+                            Abmelden
                         </TextLink>
                     </>
                 )}
@@ -40,7 +41,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
 }
 
 VerifyEmail.layout = {
-    title: 'Verify email',
+    title: 'E-Mail verifizieren',
     description:
-        'Please verify your email address by clicking on the link we just emailed to you.',
+        'Bitte verifizieren Sie Ihre E-Mail-Adresse, indem Sie auf den Link klicken, den wir Ihnen gerade per E-Mail gesendet haben.',
 };

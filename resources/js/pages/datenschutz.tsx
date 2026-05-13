@@ -6,6 +6,7 @@ export default function Datenschutz() {
     return (
         <>
             <Head title="Datenschutzerklärung - Café Wagner">
+                <link rel="icon" href="/wagner_logo.jpg" type="image/jpeg" />
                 <link
                     rel="stylesheet"
                     href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap"

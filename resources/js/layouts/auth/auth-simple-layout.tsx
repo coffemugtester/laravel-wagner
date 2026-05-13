@@ -1,5 +1,4 @@
 import { Link } from '@inertiajs/react';
-import AppLogoIcon from '@/components/app-logo-icon';
 import { home } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
 
@@ -17,8 +16,12 @@ export default function AuthSimpleLayout({
                             href={home()}
                             className="flex flex-col items-center gap-2 font-medium"
                         >
-                            <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-md">
-                                <AppLogoIcon className="size-9 fill-current text-[var(--foreground)] dark:text-white" />
+                            <div className="mb-1 flex h-24 w-24 items-center justify-center">
+                                <img
+                                    src="/wagner_logo.jpg"
+                                    alt="Café Wagner"
+                                    className="h-full w-full object-contain rounded-md"
+                                />
                             </div>
                             <span className="sr-only">{title}</span>
                         </Link>
