@@ -5,6 +5,7 @@ interface Reservation {
     id: number;
     name: string;
     date: string;
+    date_raw: string;
     time: string;
     guests: number;
     phone: string;
@@ -16,6 +17,7 @@ interface Event {
     id: number;
     name: string;
     date: string;
+    date_raw: string;
     time_from: string;
     time_to: string;
     notes?: string;
@@ -155,7 +157,14 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
 
     const handleUpdateReservation = () => {
         if (editingReservation) {
-            router.put(`/reservations/${editingReservation.id}`, editingReservation, {
+            router.put(`/reservations/${editingReservation.id}`, {
+                name: editingReservation.name,
+                date: editingReservation.date_raw,
+                time: editingReservation.time,
+                guests: editingReservation.guests,
+                phone: editingReservation.phone,
+                notes: editingReservation.notes,
+            }, {
                 onSuccess: () => closeEditModal(),
             });
         }
@@ -199,7 +208,13 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
 
     const handleUpdateEvent = () => {
         if (editingEvent) {
-            router.put(`/events/${editingEvent.id}`, editingEvent, {
+            router.put(`/events/${editingEvent.id}`, {
+                name: editingEvent.name,
+                date: editingEvent.date_raw,
+                time_from: editingEvent.time_from,
+                time_to: editingEvent.time_to,
+                notes: editingEvent.notes,
+            }, {
                 onSuccess: () => closeEventEditModal(),
             });
         }
@@ -767,27 +782,45 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
                                         <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
                                             Datum
                                         </label>
-                                        <input
-                                            type="text"
-                                            value={editingReservation.date}
-                                            onChange={(e) =>
-                                                setEditingReservation({ ...editingReservation, date: e.target.value })
-                                            }
-                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type="date"
+                                                value={editingReservation.date_raw}
+                                                onChange={(e) =>
+                                                    setEditingReservation({ ...editingReservation, date_raw: e.target.value, date: e.target.value })
+                                                }
+                                                className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 pr-10 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                            />
+                                            <img
+                                                src="/icons/calendar.svg"
+                                                alt=""
+                                                className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 cursor-pointer"
+                                                style={{ filter: 'invert(11%) sepia(73%) saturate(5348%) hue-rotate(336deg) brightness(78%) contrast(117%)' }}
+                                                onClick={() => document.querySelector(`input[value="${editingReservation.date_raw}"]`)?.showPicker?.()}
+                                            />
+                                        </div>
                                     </div>
                                     <div className="space-y-1.5">
                                         <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
                                             Uhrzeit
                                         </label>
-                                        <input
-                                            type="text"
-                                            value={editingReservation.time}
-                                            onChange={(e) =>
-                                                setEditingReservation({ ...editingReservation, time: e.target.value })
-                                            }
-                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type="time"
+                                                value={editingReservation.time}
+                                                onChange={(e) =>
+                                                    setEditingReservation({ ...editingReservation, time: e.target.value })
+                                                }
+                                                className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 pr-10 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                            />
+                                            <img
+                                                src="/icons/clock.svg"
+                                                alt=""
+                                                className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 cursor-pointer"
+                                                style={{ filter: 'invert(11%) sepia(73%) saturate(5348%) hue-rotate(336deg) brightness(78%) contrast(117%)' }}
+                                                onClick={() => document.querySelector(`input[value="${editingReservation.time}"]`)?.showPicker?.()}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -898,27 +931,45 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
                                         <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
                                             Datum
                                         </label>
-                                        <input
-                                            type="date"
-                                            value={newReservation.date}
-                                            onChange={(e) =>
-                                                setNewReservation({ ...newReservation, date: e.target.value })
-                                            }
-                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type="date"
+                                                value={newReservation.date}
+                                                onChange={(e) =>
+                                                    setNewReservation({ ...newReservation, date: e.target.value })
+                                                }
+                                                className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 pr-10 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                            />
+                                            <img
+                                                src="/icons/calendar.svg"
+                                                alt=""
+                                                className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 cursor-pointer"
+                                                style={{ filter: 'invert(11%) sepia(73%) saturate(5348%) hue-rotate(336deg) brightness(78%) contrast(117%)' }}
+                                                onClick={() => document.querySelector(`input[value="${newReservation.date}"]`)?.showPicker?.()}
+                                            />
+                                        </div>
                                     </div>
                                     <div className="space-y-1.5">
                                         <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
                                             Uhrzeit
                                         </label>
-                                        <input
-                                            type="time"
-                                            value={newReservation.time}
-                                            onChange={(e) =>
-                                                setNewReservation({ ...newReservation, time: e.target.value })
-                                            }
-                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type="time"
+                                                value={newReservation.time}
+                                                onChange={(e) =>
+                                                    setNewReservation({ ...newReservation, time: e.target.value })
+                                                }
+                                                className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 pr-10 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                            />
+                                            <img
+                                                src="/icons/clock.svg"
+                                                alt=""
+                                                className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 cursor-pointer"
+                                                style={{ filter: 'invert(11%) sepia(73%) saturate(5348%) hue-rotate(336deg) brightness(78%) contrast(117%)' }}
+                                                onClick={() => document.querySelector(`input[value="${newReservation.time}"]`)?.showPicker?.()}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1288,14 +1339,23 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
                                     <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
                                         Datum
                                     </label>
-                                    <input
-                                        type="text"
-                                        value={editingEvent.date}
-                                        onChange={(e) =>
-                                            setEditingEvent({ ...editingEvent, date: e.target.value })
-                                        }
-                                        className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
-                                    />
+                                    <div className="relative">
+                                        <input
+                                            type="date"
+                                            value={editingEvent.date_raw}
+                                            onChange={(e) =>
+                                                setEditingEvent({ ...editingEvent, date_raw: e.target.value, date: e.target.value })
+                                            }
+                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 pr-10 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                        />
+                                        <img
+                                            src="/icons/calendar.svg"
+                                            alt=""
+                                            className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 cursor-pointer"
+                                            style={{ filter: 'invert(11%) sepia(73%) saturate(5348%) hue-rotate(336deg) brightness(78%) contrast(117%)' }}
+                                            onClick={() => document.querySelector(`input[value="${editingEvent.date_raw}"]`)?.showPicker?.()}
+                                        />
+                                    </div>
                                 </div>
 
                                 {/* Uhrzeit Von - Bis */}
@@ -1304,29 +1364,47 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
                                         <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
                                             Von
                                         </label>
-                                        <input
-                                            type="time"
-                                            value={editingEvent.time_from}
-                                            onChange={(e) =>
-                                                setEditingEvent({ ...editingEvent, time_from: e.target.value })
-                                            }
-                                            placeholder="19:00"
-                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type="time"
+                                                value={editingEvent.time_from}
+                                                onChange={(e) =>
+                                                    setEditingEvent({ ...editingEvent, time_from: e.target.value })
+                                                }
+                                                placeholder="19:00"
+                                                className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 pr-10 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                            />
+                                            <img
+                                                src="/icons/clock.svg"
+                                                alt=""
+                                                className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 cursor-pointer"
+                                                style={{ filter: 'invert(11%) sepia(73%) saturate(5348%) hue-rotate(336deg) brightness(78%) contrast(117%)' }}
+                                                onClick={() => document.querySelector(`input[value="${editingEvent.time_from}"]`)?.showPicker?.()}
+                                            />
+                                        </div>
                                     </div>
                                     <div className="space-y-1.5">
                                         <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
                                             Bis
                                         </label>
-                                        <input
-                                            type="time"
-                                            value={editingEvent.time_to}
-                                            onChange={(e) =>
-                                                setEditingEvent({ ...editingEvent, time_to: e.target.value })
-                                            }
-                                            placeholder="22:00"
-                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type="time"
+                                                value={editingEvent.time_to}
+                                                onChange={(e) =>
+                                                    setEditingEvent({ ...editingEvent, time_to: e.target.value })
+                                                }
+                                                placeholder="22:00"
+                                                className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 pr-10 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                            />
+                                            <img
+                                                src="/icons/clock.svg"
+                                                alt=""
+                                                className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 cursor-pointer"
+                                                style={{ filter: 'invert(11%) sepia(73%) saturate(5348%) hue-rotate(336deg) brightness(78%) contrast(117%)' }}
+                                                onClick={() => document.querySelector(`input[value="${editingEvent.time_to}"]`)?.showPicker?.()}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1403,14 +1481,23 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
                                     <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
                                         Datum
                                     </label>
-                                    <input
-                                        type="date"
-                                        value={newEvent.date}
-                                        onChange={(e) =>
-                                            setNewEvent({ ...newEvent, date: e.target.value })
-                                        }
-                                        className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
-                                    />
+                                    <div className="relative">
+                                        <input
+                                            type="date"
+                                            value={newEvent.date}
+                                            onChange={(e) =>
+                                                setNewEvent({ ...newEvent, date: e.target.value })
+                                            }
+                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 pr-10 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                        />
+                                        <img
+                                            src="/icons/calendar.svg"
+                                            alt=""
+                                            className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 cursor-pointer"
+                                            style={{ filter: 'invert(11%) sepia(73%) saturate(5348%) hue-rotate(336deg) brightness(78%) contrast(117%)' }}
+                                            onClick={() => document.querySelector(`input[value="${newEvent.date}"]`)?.showPicker?.()}
+                                        />
+                                    </div>
                                 </div>
 
                                 {/* Uhrzeit Von - Bis */}
@@ -1419,29 +1506,47 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
                                         <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
                                             Von
                                         </label>
-                                        <input
-                                            type="time"
-                                            value={newEvent.time_from}
-                                            onChange={(e) =>
-                                                setNewEvent({ ...newEvent, time_from: e.target.value })
-                                            }
-                                            placeholder="19:00"
-                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] placeholder:text-[rgba(45,27,27,0.5)] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type="time"
+                                                value={newEvent.time_from}
+                                                onChange={(e) =>
+                                                    setNewEvent({ ...newEvent, time_from: e.target.value })
+                                                }
+                                                placeholder="19:00"
+                                                className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 pr-10 text-base text-[#2d1b1b] placeholder:text-[rgba(45,27,27,0.5)] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                            />
+                                            <img
+                                                src="/icons/clock.svg"
+                                                alt=""
+                                                className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 cursor-pointer"
+                                                style={{ filter: 'invert(11%) sepia(73%) saturate(5348%) hue-rotate(336deg) brightness(78%) contrast(117%)' }}
+                                                onClick={() => document.querySelector(`input[value="${newEvent.time_from}"]`)?.showPicker?.()}
+                                            />
+                                        </div>
                                     </div>
                                     <div className="space-y-1.5">
                                         <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
                                             Bis
                                         </label>
-                                        <input
-                                            type="time"
-                                            value={newEvent.time_to}
-                                            onChange={(e) =>
-                                                setNewEvent({ ...newEvent, time_to: e.target.value })
-                                            }
-                                            placeholder="22:00"
-                                            className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] placeholder:text-[rgba(45,27,27,0.5)] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type="time"
+                                                value={newEvent.time_to}
+                                                onChange={(e) =>
+                                                    setNewEvent({ ...newEvent, time_to: e.target.value })
+                                                }
+                                                placeholder="22:00"
+                                                className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 pr-10 text-base text-[#2d1b1b] placeholder:text-[rgba(45,27,27,0.5)] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none"
+                                            />
+                                            <img
+                                                src="/icons/clock.svg"
+                                                alt=""
+                                                className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 cursor-pointer"
+                                                style={{ filter: 'invert(11%) sepia(73%) saturate(5348%) hue-rotate(336deg) brightness(78%) contrast(117%)' }}
+                                                onClick={() => document.querySelector(`input[value="${newEvent.time_to}"]`)?.showPicker?.()}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 

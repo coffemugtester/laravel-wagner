@@ -8,11 +8,21 @@ interface MenuSection {
     items: [string, string, string][];
 }
 
-interface WelcomeProps {
-    menuSections: MenuSection[];
+interface Event {
+    id: number;
+    name: string;
+    date: string;
+    time_from: string;
+    time_to: string;
+    notes?: string;
 }
 
-export default function Welcome({ menuSections = [] }: WelcomeProps) {
+interface WelcomeProps {
+    menuSections: MenuSection[];
+    events: Event[];
+}
+
+export default function Welcome({ menuSections = [], events = [] }: WelcomeProps) {
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [reservationForm, setReservationForm] = useState({
         name: '',
@@ -64,6 +74,7 @@ export default function Welcome({ menuSections = [] }: WelcomeProps) {
                         <a href="#speisekarte">Speisekarte</a>
                         <a href="#galerie">Galerie</a>
                         <a href="#reservierung">Reservierung</a>
+                        <a href="#veranstaltungen">Veranstaltungen</a>
                     </nav>
                 </header>
 
@@ -253,26 +264,100 @@ export default function Welcome({ menuSections = [] }: WelcomeProps) {
                                 onChange={(e) => setReservationForm({ ...reservationForm, guests: e.target.value })}
                                 required
                             />
-                            <input
-                                type="date"
-                                placeholder="Datum"
-                                value={reservationForm.date}
-                                onChange={(e) => setReservationForm({ ...reservationForm, date: e.target.value })}
-                                required
-                            />
-                            <input
-                                type="time"
-                                placeholder="Uhrzeit"
-                                value={reservationForm.time}
-                                onChange={(e) => setReservationForm({ ...reservationForm, time: e.target.value })}
-                                required
-                            />
+                            <div style={{ position: 'relative', gridColumn: 'span 1' }}>
+                                <input
+                                    type="date"
+                                    placeholder="Datum"
+                                    value={reservationForm.date}
+                                    onChange={(e) => setReservationForm({ ...reservationForm, date: e.target.value })}
+                                    required
+                                    style={{ width: '100%', paddingRight: '40px' }}
+                                />
+                                <img
+                                    src="/icons/calendar.svg"
+                                    alt=""
+                                    style={{
+                                        position: 'absolute',
+                                        right: '12px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        width: '16px',
+                                        height: '16px',
+                                        cursor: 'pointer',
+                                        filter: 'invert(11%) sepia(73%) saturate(5348%) hue-rotate(336deg) brightness(78%) contrast(117%)'
+                                    }}
+                                    onClick={() => document.querySelector('input[type="date"]')?.showPicker?.()}
+                                />
+                            </div>
+                            <div style={{ position: 'relative', gridColumn: 'span 1' }}>
+                                <input
+                                    type="time"
+                                    placeholder="Uhrzeit"
+                                    value={reservationForm.time}
+                                    onChange={(e) => setReservationForm({ ...reservationForm, time: e.target.value })}
+                                    required
+                                    style={{ width: '100%', paddingRight: '40px' }}
+                                />
+                                <img
+                                    src="/icons/clock.svg"
+                                    alt=""
+                                    style={{
+                                        position: 'absolute',
+                                        right: '12px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        width: '16px',
+                                        height: '16px',
+                                        cursor: 'pointer',
+                                        filter: 'invert(11%) sepia(73%) saturate(5348%) hue-rotate(336deg) brightness(78%) contrast(117%)'
+                                    }}
+                                    onClick={() => document.querySelector('input[type="time"]')?.showPicker?.()}
+                                />
+                            </div>
                             <button className="button" type="submit">
                                 Reservierungsanfrage senden
                             </button>
                         </form>
                         <p className="contact-line">0341 99 99 49 48</p>
                         <p className="contact-line">info@wagner-cafe.de</p>
+                    </div>
+                </section>
+
+                <section id="veranstaltungen" className="section">
+                    <div className="events container">
+                        <h2>Veranstaltungen</h2>
+                        <p className="caption">
+                            Erleben Sie besondere Momente bei unseren exklusiven Events
+                        </p>
+
+                        {events.length === 0 ? (
+                            <div className="no-events">
+                                <p className="empty-message">
+                                    Bleiben Sie dran für kommende Veranstaltungen
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="events-grid">
+                                {events.map((event) => (
+                                    <div key={event.id} className="event-card">
+                                        <h3 className="event-name">{event.name}</h3>
+                                        <div className="event-details">
+                                            <div className="event-detail">
+                                                <span className="event-icon">📅</span>
+                                                <span>{event.date}</span>
+                                            </div>
+                                            <div className="event-detail">
+                                                <span className="event-icon">🕐</span>
+                                                <span>{event.time_from} - {event.time_to}</span>
+                                            </div>
+                                        </div>
+                                        {event.notes && (
+                                            <p className="event-description">{event.notes}</p>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </section>
 

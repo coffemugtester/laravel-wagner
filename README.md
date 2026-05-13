@@ -3,6 +3,8 @@ The application is runs:
 - Laravel app: http://localhost (port 80)
 - Vite dev server: http://localhost:5173
 
+Verwaltung test user: admin@wagner.test
+
 Use these commands:
 
 - ./vendor/bin/sail up -d - Start Sail containers

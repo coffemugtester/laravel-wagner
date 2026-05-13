@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
 use App\Models\MenuItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,8 +35,23 @@ class MenuController extends Controller
             ->values()
             ->toArray();
 
+        $events = Event::orderBy('date')
+            ->orderBy('time_from')
+            ->get()
+            ->map(function ($event) {
+                return [
+                    'id' => $event->id,
+                    'name' => $event->name,
+                    'date' => $event->date->format('d.m.Y'),
+                    'time_from' => $event->time_from->format('H:i'),
+                    'time_to' => $event->time_to->format('H:i'),
+                    'notes' => $event->notes,
+                ];
+            });
+
         return Inertia::render('welcome', [
             'menuSections' => $menuSections,
+            'events' => $events,
             'canRegister' => Features::enabled(Features::registration()),
         ]);
     }
