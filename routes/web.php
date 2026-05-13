@@ -7,6 +7,7 @@ use App\Http\Controllers\VerwaltungController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [MenuController::class, 'welcome'])->name('home');
+Route::inertia('/impressum', 'impressum')->name('impressum');
 
 // Public reservation requests
 Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');

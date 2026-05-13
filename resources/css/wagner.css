@@ -463,6 +463,29 @@
   margin: 6px 0;
 }
 
+.footer-bottom {
+  align-items: center;
+  border-top: 1px solid rgba(202, 188, 164, 0.3);
+  display: flex;
+  justify-content: space-between;
+  margin-top: 48px;
+  padding-top: 32px;
+}
+
+.footer-bottom p {
+  margin: 0;
+}
+
+.footer-bottom a {
+  color: #cabca4;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-bottom a:hover {
+  color: white;
+}
+
 @media (max-width: 960px) {
   .nav nav {
     display: none;

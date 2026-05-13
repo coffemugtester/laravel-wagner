@@ -417,6 +417,10 @@ export default function Welcome({ menuSections = [], events = [] }: WelcomeProps
                             <p>Mit netten Gäste bleiben wir gerne länger</p>
                         </div>
                     </div>
+                    <div className="footer-bottom container">
+                        <p>© 2024 Café Wagner. Alle Rechte vorbehalten.</p>
+                        <a href="/impressum">Impressum</a>
+                    </div>
                 </footer>
 
                 {/* Confirmation Modal */}
