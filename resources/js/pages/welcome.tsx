@@ -25,6 +25,7 @@ interface WelcomeProps {
 
 export default function Welcome({ menuSections = [], events = [] }: WelcomeProps) {
     const [showConfirmation, setShowConfirmation] = useState(false);
+    const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
     const [reservationForm, setReservationForm] = useState({
         name: '',
         email: '',
@@ -33,6 +34,13 @@ export default function Welcome({ menuSections = [], events = [] }: WelcomeProps
         date: '',
         time: '',
     });
+
+    const toggleSection = (sectionTitle: string) => {
+        setExpandedSections(prev => ({
+            ...prev,
+            [sectionTitle]: !prev[sectionTitle]
+        }));
+    };
 
     const handleSubmitReservation = (e: React.FormEvent) => {
         e.preventDefault();
@@ -196,24 +204,40 @@ export default function Welcome({ menuSections = [], events = [] }: WelcomeProps
                         <p className="caption">
                             Eine kulinarische Oper in drei Akten
                         </p>
-                        {menuSections.map((section) => (
-                            <article
-                                key={section.title}
-                                className="menu-section"
-                            >
-                                <h3>{section.title}</h3>
-                                <p className="menu-type">{section.subtitle}</p>
-                                {section.items.map(([name, desc, price]) => (
-                                    <div key={name} className="menu-item">
-                                        <div>
-                                            <h4>{name}</h4>
-                                            <p>{desc}</p>
+                        {menuSections.map((section) => {
+                            const isExpanded = expandedSections[section.title];
+                            const hasMoreItems = section.items.length > 3;
+                            const itemsToShow = isExpanded || !hasMoreItems
+                                ? section.items
+                                : section.items.slice(0, 3);
+
+                            return (
+                                <article
+                                    key={section.title}
+                                    className="menu-section"
+                                >
+                                    <h3>{section.title}</h3>
+                                    <p className="menu-type">{section.subtitle}</p>
+                                    {itemsToShow.map(([name, desc, price]) => (
+                                        <div key={name} className="menu-item">
+                                            <div>
+                                                <h4>{name}</h4>
+                                                <p>{desc}</p>
+                                            </div>
+                                            <span>{price}</span>
                                         </div>
-                                        <span>{price}</span>
-                                    </div>
-                                ))}
-                            </article>
-                        ))}
+                                    ))}
+                                    {hasMoreItems && (
+                                        <button
+                                            onClick={() => toggleSection(section.title)}
+                                            className="show-more-button"
+                                        >
+                                            {isExpanded ? 'Weniger anzeigen' : 'Mehr anzeigen'}
+                                        </button>
+                                    )}
+                                </article>
+                            );
+                        })}
                     </div>
                 </section>
 

@@ -253,6 +253,26 @@
   white-space: nowrap;
 }
 
+.show-more-button {
+  background: transparent;
+  border: 2px solid #800020;
+  border-radius: 8px;
+  color: #800020;
+  cursor: pointer;
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 500;
+  margin: 24px auto 0;
+  padding: 12px 32px;
+  transition: all 0.3s ease;
+}
+
+.show-more-button:hover {
+  background: #800020;
+  color: white;
+}
+
 .gallery-grid {
   display: grid;
   gap: 24px;

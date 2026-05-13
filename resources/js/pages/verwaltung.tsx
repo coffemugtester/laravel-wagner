@@ -245,15 +245,6 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
     };
 
     const handleAddEvent = () => {
-        console.log('handleAddEvent called', {
-            name: newEvent.name,
-            date: newEvent.date,
-            time_from: newEvent.time_from,
-            time_to: newEvent.time_to,
-            notes: newEvent.notes,
-            image: newEventImage,
-        });
-
         router.post('/events', {
             name: newEvent.name,
             date: newEvent.date,
@@ -262,13 +253,7 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
             notes: newEvent.notes || '',
             image: newEventImage,
         }, {
-            onSuccess: () => {
-                console.log('Event created successfully');
-                closeEventAddModal();
-            },
-            onError: (errors) => {
-                console.error('Error creating event:', errors);
-            },
+            onSuccess: () => closeEventAddModal(),
         });
     };
 
