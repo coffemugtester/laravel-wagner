@@ -346,7 +346,7 @@ export default function Welcome({ menuSections = [], events = [] }: WelcomeProps
                         <p className="reservation-notice">
                             Ihre Reservierung ist erst nach unserer Bestätigung verbindlich.
                             <br /><br />
-                            Mit dem Absenden der Anfrage nehmen Sie zur Kenntnis, dass Ihre Angaben zur Bearbeitung Ihrer Reservierungsanfrage verarbeitet werden. Weitere Informationen finden Sie in unserer <a href="/impressum">Datenschutzerklärung</a>.
+                            Mit dem Absenden der Anfrage nehmen Sie zur Kenntnis, dass Ihre Angaben zur Bearbeitung Ihrer Reservierungsanfrage verarbeitet werden. Weitere Informationen finden Sie in unserer <a href="/datenschutz">Datenschutzerklärung</a>.
                         </p>
                         <p className="contact-line">0341 99 99 49 48</p>
                         <p className="contact-line">info@wagner-cafe.de</p>
@@ -424,7 +424,10 @@ export default function Welcome({ menuSections = [], events = [] }: WelcomeProps
                     </div>
                     <div className="footer-bottom container">
                         <p>© 2013 Café Wagner. Alle Rechte vorbehalten.</p>
-                        <a href="/impressum">Impressum</a>
+                        <div style={{ display: 'flex', gap: '16px' }}>
+                            <a href="/impressum">Impressum</a>
+                            <a href="/datenschutz">Datenschutz</a>
+                        </div>
                     </div>
                 </footer>
 

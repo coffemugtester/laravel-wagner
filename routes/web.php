@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [MenuController::class, 'welcome'])->name('home');
 Route::inertia('/impressum', 'impressum')->name('impressum');
+Route::inertia('/datenschutz', 'datenschutz')->name('datenschutz');
 
 // Public reservation requests
 Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
