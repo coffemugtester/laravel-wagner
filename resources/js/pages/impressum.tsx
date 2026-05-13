@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import WagnerFooter from '@/components/wagner-footer';
 import '../../css/wagner.css';
 
 export default function Impressum() {
@@ -113,47 +114,7 @@ export default function Impressum() {
                     </div>
                 </section>
 
-                <footer className="footer">
-                    <div className="footer-grid container">
-                        <div className="footer-col">
-                            <h3>Café Wagner</h3>
-                            <p>
-                                Eine barocke Atmosphäre, gepaart mit modernem
-                                Purismus
-                            </p>
-                        </div>
-                        <div className="footer-col">
-                            <h3>Adresse</h3>
-                            <p>
-                                Richard-Wagner-Platz 1<br />
-                                D-04109 Leipzig
-                            </p>
-                        </div>
-                        <div className="footer-col">
-                            <h3>Kontakt</h3>
-                            <p>
-                                Telefon: 0341 99 99 49 48
-                                <br />
-                                E-Mail: mail@cafe-wagner.de
-                            </p>
-                        </div>
-                        <div className="footer-col">
-                            <h3>Öffnungszeiten</h3>
-                            <p>
-                                Mo-Fr: 10:00 - 22:00 Uhr
-                                <br />
-                                Sa-So: 09:00 - 23:00 Uhr
-                            </p>
-                        </div>
-                    </div>
-                    <div className="footer-bottom container">
-                        <p>© 2013 Café Wagner. Alle Rechte vorbehalten.</p>
-                        <div style={{ display: 'flex', gap: '16px' }}>
-                            <a href="/impressum">Impressum</a>
-                            <a href="/datenschutz">Datenschutz</a>
-                        </div>
-                    </div>
-                </footer>
+                <WagnerFooter />
             </div>
         </>
     );
