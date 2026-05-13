@@ -46,6 +46,7 @@ class MenuController extends Controller
                     'time_from' => $event->time_from->format('H:i'),
                     'time_to' => $event->time_to->format('H:i'),
                     'notes' => $event->notes,
+                    'image' => $event->image,
                 ];
             });
 

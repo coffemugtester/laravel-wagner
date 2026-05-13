@@ -15,6 +15,7 @@ interface Event {
     time_from: string;
     time_to: string;
     notes?: string;
+    image?: string;
 }
 
 interface WelcomeProps {
@@ -340,6 +341,13 @@ export default function Welcome({ menuSections = [], events = [] }: WelcomeProps
                             <div className="events-grid">
                                 {events.map((event) => (
                                     <div key={event.id} className="event-card">
+                                        {event.image && (
+                                            <img
+                                                src={`/storage/${event.image}`}
+                                                alt={event.name}
+                                                className="event-image"
+                                            />
+                                        )}
                                         <h3 className="event-name">{event.name}</h3>
                                         <div className="event-details">
                                             <div className="event-detail">

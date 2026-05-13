@@ -12,6 +12,7 @@ class Event extends Model
         'time_from',
         'time_to',
         'notes',
+        'image',
     ];
 
     protected function casts(): array

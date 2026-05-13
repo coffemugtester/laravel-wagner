@@ -21,6 +21,7 @@ interface Event {
     time_from: string;
     time_to: string;
     notes?: string;
+    image?: string;
 }
 
 interface MenuItem {
@@ -126,14 +127,17 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
     });
     const [isEventEditModalOpen, setIsEventEditModalOpen] = useState(false);
     const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+    const [editingEventImage, setEditingEventImage] = useState<File | null>(null);
     const [isEventAddModalOpen, setIsEventAddModalOpen] = useState(false);
     const [newEvent, setNewEvent] = useState<Omit<Event, 'id'>>({
         name: '',
         date: '',
+        date_raw: '',
         time_from: '',
         time_to: '',
         notes: '',
     });
+    const [newEventImage, setNewEventImage] = useState<File | null>(null);
     const [isMenuEditModalOpen, setIsMenuEditModalOpen] = useState(false);
     const [editingMenuItem, setEditingMenuItem] = useState<MenuItem | null>(null);
     const [isMenuAddModalOpen, setIsMenuAddModalOpen] = useState(false);
@@ -204,16 +208,19 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
     const closeEventEditModal = () => {
         setIsEventEditModalOpen(false);
         setEditingEvent(null);
+        setEditingEventImage(null);
     };
 
     const handleUpdateEvent = () => {
         if (editingEvent) {
-            router.put(`/events/${editingEvent.id}`, {
+            router.post(`/events/${editingEvent.id}`, {
+                _method: 'put',
                 name: editingEvent.name,
                 date: editingEvent.date_raw,
                 time_from: editingEvent.time_from,
                 time_to: editingEvent.time_to,
-                notes: editingEvent.notes,
+                notes: editingEvent.notes || '',
+                image: editingEventImage,
             }, {
                 onSuccess: () => closeEventEditModal(),
             });
@@ -229,15 +236,39 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
         setNewEvent({
             name: '',
             date: '',
+            date_raw: '',
             time_from: '',
             time_to: '',
             notes: '',
         });
+        setNewEventImage(null);
     };
 
     const handleAddEvent = () => {
-        router.post('/events', newEvent, {
-            onSuccess: () => closeEventAddModal(),
+        console.log('handleAddEvent called', {
+            name: newEvent.name,
+            date: newEvent.date,
+            time_from: newEvent.time_from,
+            time_to: newEvent.time_to,
+            notes: newEvent.notes,
+            image: newEventImage,
+        });
+
+        router.post('/events', {
+            name: newEvent.name,
+            date: newEvent.date,
+            time_from: newEvent.time_from,
+            time_to: newEvent.time_to,
+            notes: newEvent.notes || '',
+            image: newEventImage,
+        }, {
+            onSuccess: () => {
+                console.log('Event created successfully');
+                closeEventAddModal();
+            },
+            onError: (errors) => {
+                console.error('Error creating event:', errors);
+            },
         });
     };
 
@@ -1424,6 +1455,36 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
                                     />
                                 </div>
 
+                                {/* Bild */}
+                                <div className="space-y-1.5">
+                                    <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                        Bild (Optional)
+                                    </label>
+                                    {editingEvent.image && !editingEventImage && (
+                                        <div className="mb-2">
+                                            <p className="text-sm text-[#6b6b6b] tracking-[-0.1504px] mb-1">
+                                                Aktuelles Bild:
+                                            </p>
+                                            <img
+                                                src={`/storage/${editingEvent.image}`}
+                                                alt="Event"
+                                                className="h-32 object-cover rounded border border-[rgba(128,0,32,0.15)]"
+                                            />
+                                        </div>
+                                    )}
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => setEditingEventImage(e.target.files?.[0] || null)}
+                                        className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:font-medium file:bg-[#800020] file:text-white hover:file:bg-[#600018]"
+                                    />
+                                    {editingEventImage && (
+                                        <p className="text-sm text-[#6b6b6b] tracking-[-0.1504px]">
+                                            Neues Bild ausgewählt: {editingEventImage.name}
+                                        </p>
+                                    )}
+                                </div>
+
                                 {/* Action Buttons */}
                                 <div className="mt-6 flex gap-3">
                                     <button
@@ -1564,6 +1625,24 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
                                         rows={3}
                                         className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] placeholder:text-[rgba(45,27,27,0.5)] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none resize-none"
                                     />
+                                </div>
+
+                                {/* Bild */}
+                                <div className="space-y-1.5">
+                                    <label className="block text-base font-medium text-[#2d1b1b] tracking-[-0.3125px]">
+                                        Bild (Optional)
+                                    </label>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => setNewEventImage(e.target.files?.[0] || null)}
+                                        className="w-full rounded-[10px] border border-[rgba(128,0,32,0.15)] bg-[#faf8f5] px-3 py-2 text-base text-[#2d1b1b] tracking-[-0.3125px] focus:border-[#800020] focus:outline-none file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:font-medium file:bg-[#800020] file:text-white hover:file:bg-[#600018]"
+                                    />
+                                    {newEventImage && (
+                                        <p className="text-sm text-[#6b6b6b] tracking-[-0.1504px]">
+                                            Ausgewählt: {newEventImage.name}
+                                        </p>
+                                    )}
                                 </div>
 
                                 {/* Action Buttons */}
