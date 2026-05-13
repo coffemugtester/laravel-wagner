@@ -423,7 +423,7 @@ export default function Welcome({ menuSections = [], events = [] }: WelcomeProps
                         </div>
                     </div>
                     <div className="footer-bottom container">
-                        <p>© 2024 Café Wagner. Alle Rechte vorbehalten.</p>
+                        <p>© 2013 Café Wagner. Alle Rechte vorbehalten.</p>
                         <a href="/impressum">Impressum</a>
                     </div>
                 </footer>
