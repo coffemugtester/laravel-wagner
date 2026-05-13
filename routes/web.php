@@ -12,7 +12,7 @@ Route::inertia('/impressum', 'impressum')->name('impressum');
 // Public reservation requests
 Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'appearance'])->group(function () {
     Route::get('/verwaltung', [VerwaltungController::class, 'index'])->name('verwaltung');
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
 

@@ -343,6 +343,11 @@ export default function Welcome({ menuSections = [], events = [] }: WelcomeProps
                                 Reservierungsanfrage senden
                             </button>
                         </form>
+                        <p className="reservation-notice">
+                            Ihre Reservierung ist erst nach unserer Bestätigung verbindlich.
+                            <br /><br />
+                            Mit dem Absenden der Anfrage nehmen Sie zur Kenntnis, dass Ihre Angaben zur Bearbeitung Ihrer Reservierungsanfrage verarbeitet werden. Weitere Informationen finden Sie in unserer <a href="/impressum">Datenschutzerklärung</a>.
+                        </p>
                         <p className="contact-line">0341 99 99 49 48</p>
                         <p className="contact-line">info@wagner-cafe.de</p>
                     </div>

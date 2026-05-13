@@ -304,6 +304,23 @@
   padding: 34px;
 }
 
+.reservation-notice {
+  color: #6b6b6b;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 24px 0;
+  text-align: center;
+}
+
+.reservation-notice a {
+  color: #800020;
+  text-decoration: underline;
+}
+
+.reservation-notice a:hover {
+  color: #600018;
+}
+
 .reservation-form input {
   background-color: white;
   border: 1px solid #e5d4b5;

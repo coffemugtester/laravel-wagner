@@ -14,12 +14,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+        $middleware->encryptCookies(except: []);
 
         $middleware->web(append: [
-            HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
+        ]);
+
+        // Only apply appearance middleware to authenticated routes
+        $middleware->alias([
+            'appearance' => HandleAppearance::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
