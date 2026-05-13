@@ -33,43 +33,6 @@ interface MenuItem {
     available: boolean;
 }
 
-const mockReservations: Reservation[] = [
-    {
-        id: 1,
-        name: 'Sarah Müller',
-        date: '10. Mai 2026',
-        time: '19:00',
-        guests: 4,
-        phone: '030 123-4567',
-        notes: 'Fensterplatz bevorzugt',
-    },
-    {
-        id: 2,
-        name: 'Michael Schmidt',
-        date: '10. Mai 2026',
-        time: '20:00',
-        guests: 2,
-        phone: '030 234-5678',
-    },
-    {
-        id: 3,
-        name: 'Emma Fischer',
-        date: '11. Mai 2026',
-        time: '18:30',
-        guests: 6,
-        phone: '030 345-6789',
-        notes: 'Jubiläumsfeier',
-    },
-    {
-        id: 4,
-        name: 'Thomas Weber',
-        date: '11. Mai 2026',
-        time: '19:30',
-        guests: 3,
-        phone: '030 456-7890',
-    },
-];
-
 const categories = [
     'Alle',
     'Unsere geschützten Spezialitäten',
@@ -310,7 +273,9 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
             if (!acc[item.category]) {
                 acc[item.category] = [];
             }
+
             acc[item.category].push(item);
+
             return acc;
         },
         {} as Record<string, MenuItem[]>

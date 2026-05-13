@@ -67,6 +67,7 @@ export default function Welcome({ menuSections = [], events = [] }: WelcomeProps
             },
         });
     };
+
     return (
         <>
             <Head title="Café Wagner">
