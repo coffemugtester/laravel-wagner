@@ -21,8 +21,11 @@ class VerwaltungController extends Controller
                 'time' => $reservation->time->format('H:i'),
                 'guests' => $reservation->guests,
                 'phone' => $reservation->phone,
+                'email' => $reservation->email,
                 'notes' => $reservation->notes,
                 'processed' => $reservation->processed,
+                'accepted' => $reservation->isAccepted(),
+                'accepted_at' => $reservation->accepted_at?->format('d.m.Y H:i'),
             ];
         });
 

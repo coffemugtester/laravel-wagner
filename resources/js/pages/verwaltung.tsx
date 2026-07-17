@@ -9,8 +9,11 @@ interface Reservation {
     time: string;
     guests: number;
     phone: string;
+    email?: string;
     notes?: string;
     processed: boolean;
+    accepted?: boolean;
+    accepted_at?: string | null;
 }
 
 interface Event {
@@ -161,6 +164,20 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
 
     const toggleReservationProcessed = (id: number) => {
         router.patch(`/reservations/${id}/toggle`);
+    };
+
+    const acceptReservation = (reservation: Reservation) => {
+        const confirmMessage = reservation.email
+            ? `Reservierung von ${reservation.name} bestätigen? Es wird eine Bestätigungs-E-Mail an ${reservation.email} gesendet.`
+            : `Reservierung von ${reservation.name} bestätigen? Es ist keine E-Mail-Adresse hinterlegt, daher wird keine Bestätigung versendet.`;
+
+        if (!window.confirm(confirmMessage)) {
+            return;
+        }
+
+        router.post(`/reservations/${reservation.id}/accept`, {}, {
+            preserveScroll: true,
+        });
     };
 
     const openEventEditModal = (event: Event) => {
@@ -404,6 +421,13 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
                                                     {reservation.phone}
                                                 </div>
 
+                                                {/* Email */}
+                                                {reservation.email && (
+                                                    <div className="text-sm text-[#6b6b6b] tracking-[-0.1504px]">
+                                                        {reservation.email}
+                                                    </div>
+                                                )}
+
                                                 {/* Notes */}
                                                 {reservation.notes && (
                                                     <div className="rounded border-l-2 border-[#800020] bg-[rgba(247,231,206,0.5)] px-3 py-2 text-sm text-[#2d1b1b] tracking-[-0.1504px]">
@@ -426,6 +450,20 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
                                                         Bearbeitet
                                                     </span>
                                                 </label>
+
+                                                {/* Accept / Confirmation status */}
+                                                {reservation.accepted ? (
+                                                    <span className="text-sm font-medium text-[#800020] tracking-[-0.1504px]">
+                                                        ✓ Bestätigt{reservation.accepted_at ? ` am ${reservation.accepted_at}` : ''}
+                                                    </span>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => acceptReservation(reservation)}
+                                                        className="rounded-[10px] bg-[#800020] px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[#600018]"
+                                                    >
+                                                        Bestätigen
+                                                    </button>
+                                                )}
 
                                                 <div className="flex gap-2">
                                                     <button
@@ -492,6 +530,13 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
                                                     {reservation.phone}
                                                 </div>
 
+                                                {/* Email */}
+                                                {reservation.email && (
+                                                    <div className="text-sm text-[#6b6b6b] tracking-[-0.1504px]">
+                                                        {reservation.email}
+                                                    </div>
+                                                )}
+
                                                 {/* Notes */}
                                                 {reservation.notes && (
                                                     <div className="rounded border-l-2 border-[#800020] bg-[rgba(247,231,206,0.5)] px-3 py-2 text-sm text-[#2d1b1b] tracking-[-0.1504px]">
@@ -514,6 +559,20 @@ export default function Verwaltung({ menuItems = [], reservations = [], events =
                                                         Bearbeitet
                                                     </span>
                                                 </label>
+
+                                                {/* Accept / Confirmation status */}
+                                                {reservation.accepted ? (
+                                                    <span className="text-sm font-medium text-[#800020] tracking-[-0.1504px]">
+                                                        ✓ Bestätigt{reservation.accepted_at ? ` am ${reservation.accepted_at}` : ''}
+                                                    </span>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => acceptReservation(reservation)}
+                                                        className="rounded-[10px] bg-[#800020] px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[#600018]"
+                                                    >
+                                                        Bestätigen
+                                                    </button>
+                                                )}
 
                                                 <div className="flex gap-2">
                                                     <button

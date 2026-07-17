@@ -49,10 +49,10 @@ export default function Welcome({ menuSections = [], events = [] }: WelcomeProps
         router.post('/reservations', {
             name: reservationForm.name,
             phone: reservationForm.phone,
+            email: reservationForm.email,
             guests: parseInt(reservationForm.guests) || 1,
             date: reservationForm.date,
             time: reservationForm.time,
-            notes: reservationForm.email ? `E-Mail: ${reservationForm.email}` : '',
         }, {
             onSuccess: () => {
                 setShowConfirmation(true);

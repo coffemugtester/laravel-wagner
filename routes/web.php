@@ -25,6 +25,7 @@ Route::middleware(['auth', 'verified', 'appearance'])->group(function () {
     Route::put('/reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
     Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
     Route::patch('/reservations/{reservation}/toggle', [ReservationController::class, 'toggleProcessed'])->name('reservations.toggle');
+    Route::post('/reservations/{reservation}/accept', [ReservationController::class, 'accept'])->name('reservations.accept');
 
     Route::post('/events', [EventController::class, 'store'])->name('events.store');
     Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
