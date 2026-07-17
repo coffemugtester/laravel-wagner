@@ -29,6 +29,56 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - eslint (ESLINT) - v9
 - prettier (PRETTIER) - v3
 
+## Local Development Setup
+
+This application uses **Laravel Sail** (Docker) for local development to ensure consistent environments across all developers.
+
+### Running the Application
+
+**Start all services:**
+```bash
+./vendor/bin/sail up -d
+```
+
+**Run the full dev stack** (Laravel server, queue worker, logs, and Vite):
+```bash
+./vendor/bin/sail composer dev
+```
+
+The app will be available at **http://localhost**
+
+**Stop all services:**
+```bash
+./vendor/bin/sail down
+```
+
+### Why Docker is Required
+
+The `.env` file is configured for Docker networking:
+- `DB_HOST=mysql` points to the MySQL container (not localhost)
+- `DB_USERNAME=sail` and `DB_PASSWORD=password` are Docker-specific credentials
+
+Running without Sail will cause database connection errors because `mysql` hostname only exists inside Docker's network.
+
+### Package Manager
+
+This project uses **npm** (not pnpm). The `package-lock.json` is the source of truth for dependencies. Always use:
+- `./vendor/bin/sail npm install` - Install dependencies
+- `./vendor/bin/sail npm run dev` - Run Vite dev server
+- `./vendor/bin/sail npm run build` - Build for production
+
+### Common Sail Commands
+
+- `sail artisan migrate` - Run migrations
+- `sail artisan test` - Run tests
+- `sail composer install` - Install PHP dependencies
+- `sail php artisan tinker` - Interactive PHP shell
+
+**Optional:** Create a shell alias for convenience:
+```bash
+alias sail='./vendor/bin/sail'
+```
+
 ## Skills Activation
 
 This project has domain-specific skills available in `**/skills/**`. You MUST activate the relevant skill whenever you work in that domain—don't wait until you're stuck.
